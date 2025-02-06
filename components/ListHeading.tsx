@@ -1,12 +1,23 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import NameList from "./NameList";
 
 export default function ListHeading(props: any) {
+    const [showList, setShowList] = useState(false);
+    const isOdd = props.index % 2 == 0 ? true : false;
+
     return (
-        <View style={styles.container}>
-            <View>
-                <Text style={styles.letter}>{props.letter}</Text>
-            </View>
+        <View>            
+            <TouchableOpacity onPress={() => setShowList(!showList)}>
+                <View style={{...styles.container, backgroundColor: isOdd ? 'grey' : 'black'}}>
+                    <View>
+                        <Text style={styles.letter}>{props.letter}</Text>
+                    </View>
+
+                </View>
+            </TouchableOpacity>
+
+            {showList && <NameList letter={props.letter} />}
         </View>
     )
 }
@@ -14,8 +25,7 @@ export default function ListHeading(props: any) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'blue',
-        borderBottomWidth: 2
+        paddingHorizontal: 20
     },
     letter: {
         color: '#fff',
