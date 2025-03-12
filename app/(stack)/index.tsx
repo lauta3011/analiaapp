@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ABC } from '@/constants/alphabteth';
-import ListHeading from '@/components/ListHeading';
-import AddClientButton from '@/components/AddClientButton';
+import ListHeading from '@/components/lists/ListHeading';
+import FloatingButton from '@/components/atoms/FloatingButton';
 import db from '@/services/database';
 
 export default function HomeScreen() {
@@ -11,7 +11,7 @@ export default function HomeScreen() {
 
   return (
     <View style={{position: 'relative', flex: 1}}>
-      <AddClientButton handleAddClient={() => router.push('/user/addClient')} />
+      <FloatingButton handleAction={() => router.push('/user/addClient')} />
 
       <View style={styles.headingContainer}>
         <Text style={styles.heading}>¡Encontra tus clientes facilmente!</Text>

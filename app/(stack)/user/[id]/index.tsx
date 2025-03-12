@@ -2,7 +2,7 @@ import React from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { people, mockDates } from '@/constants/mockData';
-import DatesItem from '@/components/DatesItem';
+import DatesItem from '@/components/lists/DatesItem';
 import UserInfo from '@/components/UserInfo';
 
 export default function UserDetails() {

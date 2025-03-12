@@ -4,7 +4,7 @@ import Icon from "react-native-vector-icons/AntDesign";
 
 export default function AddClientButton(props: any) {
     return (
-        <TouchableOpacity onPress={props.handleAddClient} style={styles.floatingButton} >
+        <TouchableOpacity onPress={props.handleAction} style={styles.floatingButton} >
             <Icon name="pluscircleo" size={30} color="#fff" />
         </TouchableOpacity>
     );

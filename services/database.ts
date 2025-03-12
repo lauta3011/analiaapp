@@ -9,6 +9,18 @@ const initDB = () => {
     `)
 }
 
+export const postUser = async({ name, phone }: any) => {
+    const statement = await db.prepareAsync('INSERT INTO User (fullName, phone) VALUES ($fullName, $phone)')
+    try {
+        let result = await statement.executeAsync({ $fullName: name, $phone: phone });
+        console.log('bbb and 101:', result.lastInsertRowId, result.changes);
+    } catch (error) {
+        console.log('error ', error)
+    } finally {
+        await statement.finalizeAsync();
+    }
+}
+
 initDB();
 
 export default db;

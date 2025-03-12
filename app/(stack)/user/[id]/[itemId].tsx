@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { View, StyleSheet, Image, SafeAreaView, Text } from 'react-native';
 import { SketchCanvas } from '@terrylinla/react-native-sketch-canvas';
-import LashesForm from '@/components/NewClientForm';
+import LashesForm from '@/components/forms/NewClientForm';
 
 const LashForm = () => {
   const canvasRef = useRef(null);
