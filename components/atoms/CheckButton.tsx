@@ -4,7 +4,6 @@ import { Button } from "react-native-paper";
 
 const CheckButton = ({ icon, label, value, setValue }: FormAtom<boolean>) => {
     const handleChange = () => {
-        console.log('el value ', value)
         setValue(!value); 
     };
 

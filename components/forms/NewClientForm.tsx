@@ -3,7 +3,6 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import { Button, Text } from "react-native-paper";
 import TextBox from "../atoms/TextBox";
 import CheckButton from "../atoms/CheckButton";
-
 import ImageInput from "../atoms/ImageInput";
 
 const NewClientForm = (props: any) => {
@@ -37,7 +36,7 @@ const NewClientForm = (props: any) => {
     auxOther[index].value = value;
     setOther(auxOther);
   }
-  
+
   const handleSubmit = () => {
     let formData;
 
@@ -78,7 +77,7 @@ const NewClientForm = (props: any) => {
           </View>
 
           <View style={styles.buttonContainer}>
-            <CheckButton icon="account-edit-outline" setValue={() => console.log('agrega alergia')} label="agregar alergia" value={false} />
+            <CheckButton icon="account-edit-outline" setValue={() => props.handleAddDetailForm('characteristic', 'caracteristica')} label="agregar caracteristica" value={false} />
           </View>
         </View>
         
@@ -97,7 +96,7 @@ const NewClientForm = (props: any) => {
           </View>
 
           <View style={styles.buttonContainer}>
-            <CheckButton icon="account-edit-outline" setValue={() => console.log('agrega alergia')} label="agregar alergia" value={false} />
+            <CheckButton icon="account-edit-outline" setValue={() => props.handleAddDetailForm('allergy', 'alergia')} label="agregar alergia" value={false} />
           </View>
 
         </View>
