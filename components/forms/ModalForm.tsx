@@ -2,23 +2,25 @@ import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import TextBox from "../atoms/TextBox";
+import { useTagsStore } from "@/store/tags";
 
 export const ModalForm = (props: any) => {
+    const { loading, addNewTag } = useTagsStore();
     const [newItem, setNewItem] = useState('');
 
-    const handleAdd = () => {
+    const handleAdd = async () => {
         if (newItem) {
-            props.handleAddItem(newItem, props.type);
+            await addNewTag(newItem, props.type).then(() => props.handleHide());
         }
     }
     return (
         <View style={styles.overlay}>
             <View style={styles.container}>
-                <Text style={styles.text}>{`Agregar ${props.modalLabel}`}</Text>
-                <TextBox setValue={(value: string) => setNewItem(value)} label={props.modalLabel} value={newItem} />
+                <Text style={styles.text}>{`Agregar ${props.label}`}</Text>
+                <TextBox setValue={(value: string) => setNewItem(value)} label={`nombre de ${props.label}`} value={newItem} />
                 <View style={styles.button}>
-                    <Button icon={"plus"} mode={"contained"} onPress={() => handleAdd()}>
-                        {`agrergar ${props.modalLabel}`}
+                    <Button loading={loading} icon={"plus"} mode={"contained"} onPress={() => handleAdd()}>
+                        agregar
                     </Button>
                 </View>
                 <View style={styles.button}>

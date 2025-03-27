@@ -1,28 +1,69 @@
-import { StyleSheet, View } from "react-native";
-import { Avatar, Button, Icon, Text } from "react-native-paper";
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
-const ImageInput = ({ src, handleChange }: any) => {
-    return (
-        <View style={styles.container}>
-            {src && <Avatar.Image size={24} source={src} />}
-            {!src && 
-                <View >
-                    <Text>tomar foto</Text>
-                    <Icon source='account' size={23}/>
-                </View>
-            }
-        </View>
-    )
-}
+const ProfilePicture = () => {
+  const [profileImage, setProfileImage] = useState(null);
+
+  const handleTakePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Se necesitan permisos para acceder a la cámara');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      const resizedImage: any = await manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 300, height: 300 } }],
+        { format: SaveFormat.JPEG }
+      );
+      setProfileImage(resizedImage.uri);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={handleTakePhoto} style={styles.imageContainer}>
+        {profileImage ? (
+          <Image source={{ uri: profileImage }} style={styles.image} />
+        ) : (
+          <Ionicons name="person" size={60} color="#6e6e6e" />
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        display: 'flex',
-        width: '100%',
-        height: 50,
-        alignItems: 'center',
-        backgroundColor: 'lightgray'
-    }
-})
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
+  imageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+});
 
-export default ImageInput;
+export default ProfilePicture;

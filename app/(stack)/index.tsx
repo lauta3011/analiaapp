@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ABC } from '@/constants/alphabteth';
 import ListHeading from '@/components/lists/ListHeading';
 import FloatingButton from '@/components/atoms/FloatingButton';
-import db from '@/services/database';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -19,7 +18,7 @@ export default function HomeScreen() {
       </View>
       <FlatList keyExtractor={(index) => index.toString()} style={styles.list} data={ABC} renderItem={({item, index}) => 
         <ListHeading letter={item} index={index} />
-      }/>
+      }/>      
     </View>
   );
 }

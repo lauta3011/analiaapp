@@ -1,41 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { Button, Text } from "react-native-paper";
 import TextBox from "../atoms/TextBox";
-import CheckButton from "../atoms/CheckButton";
 import ImageInput from "../atoms/ImageInput";
+import { useTagsStore } from "@/store/tags";
+import { TagsList } from "../lists/TagsList";
+import { ALLERGY_INFO, CHARACTERISTIC_INFO } from "@/constants";
 
-const NewClientForm = (props: any) => {
+export const NewClientForm = (props: any) => {
+  const { loading, error, allergies, characteristics, setAllergy, setCharacteristic, fetchAllergies, fetchCharacteristics } = useTagsStore();
+
+  // TODO add types 
   const [person, setPerson] = useState({
     fullName: '',
     phone: '',
     photo: ''
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-
-  const [details, setDetails] = useState([
-    { field: "lentes", value: false },
-    { field: "lentes-de-contacto", value: false} 
-  ]);
-
-  const [other, setOther] = useState([
-    { field: "moho", value: false}, 
-    { field: "animales", value: false }
-  ])
-
-  const handleCheckDetail = (value: boolean, index: number) => {
-    const auxDetails = [...details];
-    auxDetails[index].value = value;
-    setDetails(auxDetails);
+  const fetchData = async () => {
+    fetchAllergies();
+    fetchCharacteristics();
   }
 
-  const handleCheckOther = (value: boolean, index: number) => {
-    const auxOther = [...other];
-    auxOther[index].value = value;
-    setOther(auxOther);
-  }
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleSubmit = () => {
     let formData;
@@ -43,75 +32,32 @@ const NewClientForm = (props: any) => {
     if (person.fullName && person.phone) {
       formData = {
         ...person,
-        details: details,
-        other: other
+        characteristics: characteristics.filter((item) => item.value === true),
+        allergies: allergies.filter((item) => item.value === true),
       }
-
-      props.handleSubmit(formData);
+      console.log('$$ ', formData)
       return;
     }
-    
-    setIsLoading(false);
-    setIsError(true);
   }
-
+  
   return (
-    <ScrollView style={styles.container}>
-        <ImageInput src={person.photo} handleChange={(value: string) => setPerson((prevForm) => ({...prevForm, photo: value}))} />
+    <View style={styles.container}>
+        <ImageInput />
 
         <TextBox setValue={(value: string) => setPerson((prevForm) => ({...prevForm, fullName: value}))} label="* Nombre y apellido" value={person.fullName} />
         <TextBox setValue={(value: string) => setPerson((prevForm) => ({...prevForm, phone: value}))} label="* Nro telefono" value={person.phone} />
 
-        <View style={styles.innerContainer}>
-          <Text style={styles.subHeading}>Caracteristicas</Text>
-          <Text style={styles.helpeTxt}>uso de lentes, productos para los ojos o alguna medicacion particular que creas puede ser relevante saber</Text>
-
-          <View style={styles.listContainer}>
-            {details.map((item: any, index) => {
-              return (
-                <View key={index} style={styles.buttonContainer}>
-                  <CheckButton setValue={(value: boolean) => handleCheckDetail(value, index)} label={item.field} value={item.value} />
-                </View>
-              )
-            })}
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <CheckButton icon="account-edit-outline" setValue={() => props.handleAddDetailForm('characteristic', 'caracteristica')} label="agregar caracteristica" value={false} />
-          </View>
-        </View>
+        <TagsList type={CHARACTERISTIC_INFO.TYPE} label={CHARACTERISTIC_INFO.LABEL} title={CHARACTERISTIC_INFO.TITLE} subText={CHARACTERISTIC_INFO.SUB_TEXT} list={characteristics} handleAction={(id: number) => setCharacteristic(id)} handleModal={(type: string, label: string) => props.handleModal(type, label)} />
+        <TagsList type={ALLERGY_INFO.TYPE} label={ALLERGY_INFO.LABEL} title={ALLERGY_INFO.TITLE} subText={ALLERGY_INFO.SUB_TEXT} list={allergies} handleAction={(id: number) => setAllergy(id)} handleModal={(type: string, label: string) => props.handleModal(type, label)} />
         
-        <View style={styles.innerContainer}>
-            <Text style={styles.subHeading}>Alergias</Text>
-            <Text style={styles.helpeTxt}>ya sea a productos basado en experiencias pasadas o reacciones alergicas que consideres relevantes</Text>
+        {error && <View style={styles.error}><Text style={{color: 'white', fontWeight: 'bold'}}>Hay campos vacios</Text></View>}
 
-            <View style={styles.listContainer}>
-              {other.map((item: any, index) => {
-                return (
-                  <View key={index} style={styles.buttonContainer}>
-                    <CheckButton setValue={(value: boolean) => handleCheckOther(value, index)} label={item.field} value={item.value} />
-                  </View>
-                )
-              })}
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <CheckButton icon="account-edit-outline" setValue={() => props.handleAddDetailForm('allergy', 'alergia')} label="agregar alergia" value={false} />
-          </View>
-
-        </View>
-        
-        {isError && <View style={styles.error}><Text style={{color: 'white', fontWeight: 'bold'}}>Hay campos vacios</Text></View>}
-        <Button loading={isLoading} mode="outlined" onPress={() => { setIsLoading(true); setIsError(false); handleSubmit() }} style={{ marginTop: 20 }}>agregar cliente</Button>
-    </ScrollView>
+        <Button  loading={loading} mode="contained-tonal" onPress={() => { handleSubmit() }} style={{ marginTop: 20 }}>agregar cliente</Button>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-    subHeading: {
-      fontSize: 23,
-      fontWeight: 'thin'
-    },
     error: {
       margin: 15,
       display: 'flex',
@@ -120,23 +66,7 @@ const styles = StyleSheet.create({
       backgroundColor: 'red'
     },
     container: {
-      padding: 18
-    },
-    helpeTxt: {
-      fontStyle: "italic",
-      color: 'grey',
-      padding: 5
-    },
-    innerContainer: {
-      marginTop: 18
-    },
-    listContainer: {
-      flexDirection: 'row', 
-      flexWrap: 'wrap',
-    },
-    buttonContainer: {
-      flexGrow: 3,
-      margin: 5,
+      padding: 40,
     }
 })
 
