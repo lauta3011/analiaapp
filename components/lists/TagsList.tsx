@@ -17,11 +17,11 @@ export const TagsList = (props: any) => {
             <View style={styles.listContainer}>
                 {list.map((item: any, index: number) => {
                 return (
-                    <CheckButton key={index} setValue={() => handleAction(item.id)} label={item.name} value={item.value} />
+                    <CheckButton number={false} key={index} setValue={() => handleAction(item.id)} label={item.name} value={item.value} />
                 )
                 })}
                 <View style={{ margin: 5}}>
-                    <Button icon="account-edit-outline" mode="outlined" onPress={() => handleModal(type, label)} >{`agregar ${label}`}</Button>
+                    <Button icon="account-edit-outline" mode="contained-tonal" onPress={() => handleModal(type, label)} >{`agregar ${label}`}</Button>
                 </View>
             </View>
         </View>

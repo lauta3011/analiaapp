@@ -59,6 +59,9 @@ export const people = [
     { id: 6, idUser: 106, date: "2025-02-06" },
     { id: 7, idUser: 107, date: "2025-02-07" },
     { id: 8, idUser: 108, date: "2025-02-08" },
-    { id: 9, idUser: 109, date: "2025-02-09" },
+    { id: 33, idUser: 109, date: "2025-02-09" },
+    { id: 22, idUser: 109, date: "2025-02-09" },
+    { id: 66, idUser: 109, date: "2025-02-09" },
+    { id: 88, idUser: 109, date: "2025-02-09" },
     { id: 10, idUser: 110, date: "2025-02-10" }
   ];

@@ -17,7 +17,7 @@ export const ModalForm = (props: any) => {
         <View style={styles.overlay}>
             <View style={styles.container}>
                 <Text style={styles.text}>{`Agregar ${props.label}`}</Text>
-                <TextBox setValue={(value: string) => setNewItem(value)} label={`nombre de ${props.label}`} value={newItem} />
+                <TextBox number={false} setValue={(value: string) => setNewItem(value)} label={`nombre de ${props.label}`} value={newItem} />
                 <View style={styles.button}>
                     <Button loading={loading} icon={"plus"} mode={"contained"} onPress={() => handleAdd()}>
                         agregar

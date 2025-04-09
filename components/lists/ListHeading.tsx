@@ -1,10 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import NameList from "./NameList";
+import { fetchUserByLetter } from "@/database/database";
 
 export default function ListHeading(props: any) {
     const [showList, setShowList] = useState(false);
+    const [filteredNames, setFilteredNames] = useState([]);
     const isOdd = props.index % 2 == 0 ? true : false;
+
+    useEffect(() => {
+        async function fetchNames() {
+            const data: any = await fetchUserByLetter(props.letter);
+            setFilteredNames(data);
+        }
+
+        if (showList) {
+            fetchNames();
+        }
+    }, [showList])
 
     return (
         <View>            
@@ -17,7 +30,7 @@ export default function ListHeading(props: any) {
                 </View>
             </TouchableOpacity>
 
-            {showList && <NameList letter={props.letter} />}
+            {showList && <NameList filteredNames={filteredNames} />}
         </View>
     )
 }

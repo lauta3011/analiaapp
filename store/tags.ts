@@ -2,8 +2,8 @@ import { ALLERGY_INFO, CHARACTERISTIC_INFO } from '@/constants';
 import { 
     fetchAllergies as fetchAllergiesDB,
     fetchCharacteristics as fetchCharacteristicsDB, 
-    fetchIndividualAllergy as fetchIndividualAllergyDB, 
-    fetchIndividualCharacteristic as fetchIndividualCharacteristicDB, 
+    fetchSingleAllergy as fetchSingleAllergyDB, 
+    fetchSingleCharacteristic as fetchSingleCharacteristicDB, 
     postAllergy, 
     postCharacteristic 
 } from '@/database/database';
@@ -39,8 +39,7 @@ export const useTagsStore = create<TagsStore>((set) => ({
             if (type === ALLERGY_INFO.TYPE) {
                 await postAllergy(item).then(async (id) => {
                     if (id) {
-                        const allergy: any = await fetchIndividualAllergyDB(id);
-                        const aux = { ...allergy, value: true };
+                        const allergy: any = await fetchSingleAllergyDB(id);
                         set((state) => ({ 
                             allergies: [...state.allergies, ...allergy]
                         }));
@@ -49,7 +48,7 @@ export const useTagsStore = create<TagsStore>((set) => ({
             } else if (type === CHARACTERISTIC_INFO.TYPE) {
                 await postCharacteristic(item).then(async (id) => {
                     if (id) {
-                        const characteristic: any = await fetchIndividualCharacteristicDB(id);
+                        const characteristic: any = await fetchSingleCharacteristicDB(id);
                         const aux = { ...characteristic, value: true };
                         set((state) => ({ 
                             characteristics: [...state.characteristics, ...characteristic]
@@ -86,17 +85,6 @@ export const useTagsStore = create<TagsStore>((set) => ({
             set({ allergies: aux, loading: false });
         } catch (error) {
             set({ error: 'Failed to fetch allergies', loading: false });
-        }
-    },
-    fetchIndividualAllergy: async (id: number) => {
-        set({ loading: true });
-        try {
-            const allergy: any = await fetchIndividualAllergyDB(id);
-            return { ...allergy, value: false };
-        } catch (error) {
-            set({ error: 'Failed to fetch allergies', loading: false });
-        } finally {
-            set({ loading: false });
         }
     },
     fetchCharacteristics: async () => {

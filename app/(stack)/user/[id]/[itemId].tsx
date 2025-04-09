@@ -4,7 +4,6 @@ import { SketchCanvas } from '@terrylinla/react-native-sketch-canvas';
 import LashesForm from '@/components/forms/NewClientForm';
 
 const LashForm = () => {
-  const canvasRef = useRef(null);
 
   return (
     <View>

@@ -1,23 +1,25 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, Pressable, View } from "react-native";
 
 export default function DatesItem(props: any) {
     return (
-        <TouchableOpacity onPress={() => props.handlePress(props.id)}>
+        <Pressable onPress={() => props.handlePress(props.id)}>
             <View style={styles.container}>
                 <Text style={styles.text}>{props.date}</Text>
             </View>
-        </TouchableOpacity>
+        </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
     container: { 
         padding: 10, 
-        borderBottomWidth: 1, 
-        borderBottomColor: '#ccc', 
+        margin: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
     },
     text: {
-        fontSize: 18
+        fontSize: 20
     }
 })

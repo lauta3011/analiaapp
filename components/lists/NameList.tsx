@@ -1,25 +1,26 @@
 import React from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import Icon from 'react-native-vector-icons/AntDesign';
-import { people } from "@/constants/mockData";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 export default function NameList(props: any) {
-    const filteredNames = people.filter(({ name }) => name[0] === props.letter);
-    const router = useRouter();
-
     return (
       <View style={styles.container}>
-        {filteredNames.length > 0 ? 
+        {props.filteredNames.length > 0 ? 
                 <FlatList
-                data={filteredNames}
+                data={props.filteredNames}
                 renderItem={({ item }) => (
-                    <View style={styles.itemContainer}>
-                    <Text style={styles.name}>{item.name}</Text>
-                    <TouchableOpacity onPress={() => router.push(`/user/${item.id}`)}>
-                        <Icon name="arrowright" size={20} color="#000" />
-                    </TouchableOpacity>
-                    </View>
+                    <Link href={{
+                      pathname: "/user/[id]",
+                      params: { id: item.id }
+                    }} asChild>
+                      <Pressable>
+                        <View style={styles.itemContainer}>
+                          <Text style={styles.name}>{item.full_name}</Text>
+                          <Icon name="arrowright" size={20} color="#000" />
+                        </View>
+                      </Pressable>
+                    </Link>
                 )}
                 keyExtractor={(item) => item.id}
             />

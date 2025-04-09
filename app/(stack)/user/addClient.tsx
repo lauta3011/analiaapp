@@ -9,10 +9,6 @@ export default function AddClient() {
     const [modalLabel, setModalLabel] = useState('');
     const [modalType, setModalType] = useState('');
 
-    const handleAddUser = async(form: any) => {
-        await postUser(form).then(() => setShowModalForm(false));
-    }
-
     const handleShowModal = (type: string, label: string) => {
         setModalType(type);
         setModalLabel(label);
@@ -21,7 +17,7 @@ export default function AddClient() {
     return (
         <ScrollView>
             <Text style={{ fontSize: 36, margin: 12, textAlign: 'center' }}>Agrega un nuevo cliente</Text>
-            <NewClientForm handleModal={(value: string, label: string) => handleShowModal(value, label)} handleSubmit={(form: any) => handleAddUser(form)} />
+            <NewClientForm handleModal={(value: string, label: string) => handleShowModal(value, label)} />
             {showModalForm && <ModalForm handleHide={() => setShowModalForm(false)} label={modalLabel} type={modalType} />}
         </ScrollView>
     )

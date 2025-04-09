@@ -2,23 +2,22 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function UserInfo(props: any) {
-  const [showAlergias, setShowAlergias] = useState(false);
+  const { full_name, picture_path, phone } = props.user;
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: props.image }}
-        style={styles.image}
-      />
+    <Image 
+      source={{ uri: picture_path }}
+      style={styles.image}
+    />
 
       <View style={{ flex: 1 }}>
-        <Text style={[styles.name, styles.text]}>{props.name}</Text>
-        <Text style={styles.text}>{props.age} años</Text>
-        <Text style={styles.text}>Teléfono: {props.phone}</Text>
+        <Text style={[styles.name, styles.text]}>{full_name}</Text>
+        <Text style={styles.text}>Teléfono: {phone}</Text>
       </View>
 
-      <TouchableOpacity onPress={() => setShowAlergias(!showAlergias)}>
-        <Text style={styles.alergies}>Ver Alergias</Text>
+      <TouchableOpacity onPress={() => console.log('llevame al form')}>
+        <Text style={styles.headerButton}>nueva consulta</Text>
       </TouchableOpacity>
     </View>
   );
@@ -34,19 +33,21 @@ const styles = StyleSheet.create({
         color: '#FFF'
     },
     image: { 
-        width: 60, 
-        height: 60, 
-        borderRadius: 30, 
+        backgroundColor: 'lightgrey',
+        width: 90, 
+        height: 90, 
+        borderRadius: 50, 
         marginRight: 15 
     },
     text: {
-      color: '#FFF'
+      color: '#FFF',
     },
     name: { 
-        fontSize: 18, 
+      marginBottom: 5,
+        fontSize: 23, 
         fontWeight: 'bold' ,
     },
-    alergies: { 
+    headerButton: { 
         backgroundColor: 'white',
         padding: 10,
         borderRadius: 15,

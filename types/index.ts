@@ -3,7 +3,8 @@ export interface FormAtom<T> {
     label: string,
     value?: T, 
     setValue: any, 
-    error?: boolean 
+    error?: boolean, 
+    number: boolean
 }
 
 export interface NewClient {
