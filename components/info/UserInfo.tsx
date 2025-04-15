@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { router } from 'expo-router';
+import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function UserInfo(props: any) {
-  const { full_name, picture_path, phone } = props.user;
+  const { full_name, picture_path, phone, id } = props.user;
 
   return (
     <View style={styles.container}>
@@ -16,7 +17,7 @@ export default function UserInfo(props: any) {
         <Text style={styles.text}>Teléfono: {phone}</Text>
       </View>
 
-      <TouchableOpacity onPress={() => console.log('llevame al form')}>
+      <TouchableOpacity onPress={() => router.push(`/user/${id}/newClientForm`)}>
         <Text style={styles.headerButton}>nueva consulta</Text>
       </TouchableOpacity>
     </View>
