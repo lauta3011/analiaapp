@@ -12,17 +12,18 @@ const storePicture = async (uri: string) => {
     return newPath;
 }
 
-export const addNewUser = async ({ fullName, phone, picture: picturePath, allergies, characteristics }: any) => {
+export const addNewUser = async ({ fullName, phone, picture: picturePath, notes, allergies, characteristics }: any) => {
     let picture = null;
     try {
         if (picturePath) {
             picture = await storePicture(picturePath);
         }
-        await postUser({ fullName, phone, picture }).then(async (id: any) => {
+        await postUser({ fullName, phone, picture, notes }).then(async (id: any) => {
             await associateAllergies(id, allergies);
             await associateCharacteristics(id, characteristics);
         });
     } catch (error) {
+        console.log('error ', error)
         throw new Error('un usuario ya existe con ese telefono')
     }
 }

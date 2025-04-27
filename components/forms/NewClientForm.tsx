@@ -12,7 +12,7 @@ import { Text } from "react-native-paper";
 
 export const NewClientForm = (props: any) => {
   const { allergies, characteristics, setAllergy, setCharacteristic, fetchAllergies, fetchCharacteristics } = useTagsStore();
-  const { serError, confirmUser, loading: formLoading, errors, success } = useFormStore();
+  const { serError, confirmUser, resetSuccess, loading: formLoading, errors, success } = useFormStore();
   // TODO add types 
   const [person, setPerson] = useState({
     fullName: '',
@@ -27,6 +27,7 @@ export const NewClientForm = (props: any) => {
   }
 
   useEffect(() => {
+    resetSuccess();
     fetchData();
   }, []);
 
@@ -38,7 +39,7 @@ export const NewClientForm = (props: any) => {
         ...person,
         picture,
         characteristics: characteristics.filter((item) => item.value === true),
-        allergies: allergies.filter((item) => item.value === true),
+        allergies: allergies.filter((item) => item.value === true)
       }
       confirmUser(formData);
     } else {

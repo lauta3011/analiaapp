@@ -13,8 +13,7 @@ export default function HomeScreen() {
       <FloatingButton handleAction={() => router.push('/user/addClient')} />
 
       <View style={styles.headingContainer}>
-        <Text style={styles.heading}>¡Encontra tus clientes facilmente!</Text>
-        <Text style={styles.subText}>Estaran ordenados alfabeticamente segun la inicial de su primer nombre.</Text>
+        <Text style={styles.text}>tus clientes estaran ordenados alfabeticamente segun la inicial de su primer nombre.</Text>
       </View>
       <FlatList keyExtractor={(index) => index.toString()} style={styles.list} data={ABC} renderItem={({item, index}) => 
         <ListHeading letter={item} index={index} />
@@ -25,14 +24,14 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   headingContainer: {
-    padding: 16,
+    padding: 28,
   },
   heading: {
     textAlign: 'center',
     fontSize: 32,
     fontWeight: 400
   },
-  subText: {
+  text: {
     fontSize: 24,
     fontWeight: 200,
     textAlign: 'justify'

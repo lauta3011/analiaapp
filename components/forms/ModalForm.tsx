@@ -1,33 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, Text } from "react-native-paper";
-import TextBox from "../atoms/TextBox";
-import { useTagsStore } from "@/store/tags";
+import { Text } from "react-native-paper";
 
 export const ModalForm = (props: any) => {
-    const { loading, addNewTag } = useTagsStore();
-    const [newItem, setNewItem] = useState('');
-
-    const handleAdd = async () => {
-        if (newItem) {
-            await addNewTag(newItem, props.type).then(() => props.handleHide());
-        }
-    }
     return (
         <View style={styles.overlay}>
             <View style={styles.container}>
-                <Text style={styles.text}>{`Agregar ${props.label}`}</Text>
-                <TextBox number={false} setValue={(value: string) => setNewItem(value)} label={`nombre de ${props.label}`} value={newItem} />
-                <View style={styles.button}>
-                    <Button loading={loading} icon={"plus"} mode={"contained"} onPress={() => handleAdd()}>
-                        agregar
-                    </Button>
-                </View>
-                <View style={styles.button}>
-                    <Button mode={"text"} onPress={() => props.handleHide()}>
-                        {`cancelar`}
-                    </Button>
-                </View>
+            <Text style={styles.close} onPress={() => props.handleHide()}>cerrar</Text>
+                {props.children}
             </View>
         </View>
     )
@@ -53,11 +33,8 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         padding: 15
     },
-    text: {
-        fontSize: 28,
-        margin: 5
-    },
-    button: {
-        marginTop: 10
+    close: {
+        padding: 10,
+        textAlign: 'right',
     }
 })

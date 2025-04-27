@@ -1,9 +1,7 @@
 import * as SQLite from "expo-sqlite";
 
-// Abrir la base de datos
-const db = SQLite.openDatabaseAsync("db5.db");
+const db = SQLite.openDatabaseAsync("db-v3.db");
 
-// Función para inicializar la base de datos
 const initializeDB = async () => {
     try {
         const database = await db;
@@ -22,6 +20,18 @@ const initializeDB = async () => {
             CREATE TABLE IF NOT EXISTS ALLERGY (
                 id INTEGER PRIMARY KEY NOT NULL,
                 name TEXT NOT NULL
+            )
+        `);
+
+        await database.execAsync(`
+            CREATE TABLE IF NOT EXISTS EYELASH_DRAWING (
+                id INTEGER NOT NULL,
+                id_user INTEGER,
+                type INTEGER NOT NULL,
+                data TEXT NOT NULL,
+                dateCreated TEXT DEFAULT (datetime('now')),
+                PRIMARY KEY (id_user, id),
+                FOREIGN KEY (id_user) REFERENCES USER(id_user) ON DELETE CASCADE           
             )
         `);
 
@@ -87,8 +97,30 @@ export const fetchUserByLetter = async (letter: string) => {
 
 export const fetchUserAllergies = async (id: number) => {
     const database = await db;
-    const userAllergies = await database.getAllAsync(`SELECT * FROM ALLERGY_USER WHERE id_user = ${id}`);
-    return userAllergies;
+    try {
+        const userAllergies = await database.getAllAsync(`SELECT a.name AS allergy_name
+              FROM USER u
+              JOIN ALLERGY_USER ua ON u.id = ua.id_user
+              JOIN ALLERGY a ON ua.id_allergy = a.id
+              WHERE u.id = ${id};`);
+        return userAllergies;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export const fetchUserCharacteristics = async (id: number) => {
+    const database = await db;
+    try {
+        const userAllergies = await database.getAllAsync(`SELECT c.name AS characteristic_name
+              FROM USER u
+              JOIN CHARACTERISTIC_USER uc ON u.id = uc.id_user
+              JOIN CHARACTERISTIC c ON uc.id_characteristic = c.id
+              WHERE u.id = ${id};`);
+        return userAllergies;
+    } catch (error) {
+        console.log(error)
+    }
 };
 
 export const fetchSingleUser = async (id: number) => {
@@ -121,6 +153,18 @@ export const fetchCharacteristics = async () => {
     return characteristics;
 };
 
+export const fetchDrawing = async (user: number) => {
+    const database = await db;
+    try {
+        console.log('$ entra db')
+        const drawing = await database.getAllAsync(`SELECT * FROM EYELASH_DRAWING WHERE id_user = ${user}`);
+        console.log('%%%%%%%%%%% ', drawing)
+        return drawing;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 export const postUser = async (user: any) => {
     const { fullName: full_name, phone, picture: picture_path, notes } = user;
     const database = await db;
@@ -131,6 +175,25 @@ export const postUser = async (user: any) => {
 
     try {
         const result = await statement.executeAsync({ $full_name: full_name, $phone: phone, $picture_path: picture_path, $notes: notes });
+        return result.lastInsertRowId;
+    } catch (error: any) {
+        console.log('error', error )
+        throw new Error(error);
+    } finally {
+        await statement.finalizeAsync();
+    }
+};
+
+export const addDrawing = async (drawingInfo: any) => {
+    const { user: user_id , type, data } = drawingInfo;
+    const database = await db;
+
+    let statement: SQLite.SQLiteStatement = await database.prepareAsync(
+        'INSERT INTO EYELASH_DRAWING (user_id, type, data) VALUES ($user_id, $type, $data)'
+    );
+
+    try {
+        const result = await statement.executeAsync({ $user_id: user_id, $type: type, $data: data });
         return result.lastInsertRowId;
     } catch (error: any) {
         throw new Error(error);

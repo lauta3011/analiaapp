@@ -6,6 +6,7 @@ interface FormStore {
     errors: { msg: string | null },
     loading: boolean,
     confirmUser: (form: object) => void,
+    resetSuccess: () => void,
     serError: (error: string) => void
 }
 
@@ -16,9 +17,9 @@ export const useFormStore = create<FormStore>((set) => ({
     ///// TODO FORM TYPES
     confirmUser: async (form: any) => {
         set({ loading: true });
-        const { allergies, characteristics, fullName, phone, picture } = form;
+        const { allergies, characteristics, fullName, phone, picture, notes } = form;
         try {
-            await addNewUser({ fullName, phone, picture, allergies, characteristics }).then(() => {
+            await addNewUser({ fullName, phone, picture, notes, allergies, characteristics }).then(() => {
                 set({ success: true });
             })
         } catch (error: any) {
@@ -27,6 +28,7 @@ export const useFormStore = create<FormStore>((set) => ({
             set({ loading: false });
         }
     },
+    resetSuccess: () => set({ success: false }),
     serError: (error: string) => {
         set({ errors: { msg: error } })
     }
