@@ -3,9 +3,9 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 
 export default function UserTags(props: any) {
   return (
-    <View>
+    <View style={styles.container}>
       <Text style={styles.title}>{props.title}</Text>
-      <View style={styles.container}>
+      <View style={styles.tagContainer}>
         {props.items.map((item: any, index: number) => (
           <View key={index} style={styles.itemBox}>
             <Text style={styles.text}>{item}</Text>
@@ -17,16 +17,21 @@ export default function UserTags(props: any) {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
   title: {
     fontSize: 26,
-    textAlign: 'center',
+    fontWeight: '400',
     marginVertical: 5
   },
-  container: {
+  tagContainer: {
     flexDirection: 'row',
+
     flexWrap: 'wrap',
     gap: 10, 
-    padding: 5,
+    padding: 15,
   },
   itemBox: {
     width: '48%',
@@ -34,7 +39,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   text: {
-    textAlign: 'center',
     fontSize: 16,
     fontWeight: '300'
   },

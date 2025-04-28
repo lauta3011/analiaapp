@@ -22,11 +22,10 @@ const styles = StyleSheet.create({
         transform: 'translate(-50%, -50%)',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'white'
     },
     container: {
         display: 'flex',
-        width: '65%',
+        width: 400,
         position: 'relative',
         backgroundColor: 'white',
         boxShadow: '0px 0px 500px 1px',

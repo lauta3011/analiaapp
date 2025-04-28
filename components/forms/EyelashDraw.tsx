@@ -15,16 +15,18 @@ export const EyelashDraw = (props: any) => {
   const { userId } = props;
   const [selected, setSelected] = useState<ImageKey>(1);
 
-  const confirmDrawing = (drawing: string) => {
-    addDrawing({userId, selected, drawing});
+  const confirmDrawing = async (drawing: string) => {
+    await addDrawing({userId, selected, drawing}).then(() => {
+      props.confirmForm()
+    });
   }
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.buttonRow}>
-        <Button mode={selected === 1 ? 'contained' : 'outlined'} onPress={() => setSelected(1)} >Natural</Button>
-        <Button mode={selected === 2 ? 'contained' : 'outlined'} onPress={() => setSelected(2)} >Abierta</Button>
-        <Button mode={selected === 3 ? 'contained' : 'outlined'} onPress={() => setSelected(3)} >Suave</Button>
+        <Button mode={selected === 1 ? 'contained' : 'outlined'} onPress={() => setSelected(1)}>Natural</Button>
+        <Button mode={selected === 2 ? 'contained' : 'outlined'} onPress={() => setSelected(2)}>Abierta</Button>
+        <Button mode={selected === 3 ? 'contained' : 'outlined'} onPress={() => setSelected(3)}>Suave</Button>
       </View>
 
       <Canvas handleAddEyelash={(drawing: string) => confirmDrawing(drawing)}>

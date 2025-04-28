@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabaseAsync("db-v3.db");
+const db = SQLite.openDatabaseAsync("db-v4.db");
 
 const initializeDB = async () => {
     try {
@@ -25,12 +25,11 @@ const initializeDB = async () => {
 
         await database.execAsync(`
             CREATE TABLE IF NOT EXISTS EYELASH_DRAWING (
-                id INTEGER NOT NULL,
+                id INTEGER PRIMARY KEY NOT NULL,
                 id_user INTEGER,
                 type INTEGER NOT NULL,
                 data TEXT NOT NULL,
                 dateCreated TEXT DEFAULT (datetime('now')),
-                PRIMARY KEY (id_user, id),
                 FOREIGN KEY (id_user) REFERENCES USER(id_user) ON DELETE CASCADE           
             )
         `);
@@ -156,14 +155,14 @@ export const fetchCharacteristics = async () => {
 export const fetchDrawing = async (user: number) => {
     const database = await db;
     try {
-        console.log('$ entra db')
-        const drawing = await database.getAllAsync(`SELECT * FROM EYELASH_DRAWING WHERE id_user = ${user}`);
-        console.log('%%%%%%%%%%% ', drawing)
-        return drawing;
+      const drawing = await database.getAllAsync(
+        `SELECT * FROM EYELASH_DRAWING WHERE id_user = ${user} ORDER BY dateCreated DESC LIMIT 1`
+      );
+      return drawing[0];
     } catch (error) {
-        console.log(error)
+      console.log(error);
     }
-};
+  };
 
 export const postUser = async (user: any) => {
     const { fullName: full_name, phone, picture: picture_path, notes } = user;
@@ -185,17 +184,18 @@ export const postUser = async (user: any) => {
 };
 
 export const addDrawing = async (drawingInfo: any) => {
-    const { user: user_id , type, data } = drawingInfo;
+    const { userId: id_user , selected: type, drawing: data } = drawingInfo;
     const database = await db;
 
     let statement: SQLite.SQLiteStatement = await database.prepareAsync(
-        'INSERT INTO EYELASH_DRAWING (user_id, type, data) VALUES ($user_id, $type, $data)'
+        'INSERT INTO EYELASH_DRAWING (id_user, type, data) VALUES ($id_user, $type, $data)'
     );
 
     try {
-        const result = await statement.executeAsync({ $user_id: user_id, $type: type, $data: data });
+        const result = await statement.executeAsync({ $id_user: id_user, $type: type, $data: data });
         return result.lastInsertRowId;
     } catch (error: any) {
+        console.log('ERROR ', error)
         throw new Error(error);
     } finally {
         await statement.finalizeAsync();

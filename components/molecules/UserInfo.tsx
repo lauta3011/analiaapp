@@ -1,38 +1,40 @@
-import { router } from 'expo-router';
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 
 const placeholder = require('@/assets/images/placeholder.png')
 
 export default function UserInfo(props: any) {
-  const { full_name, picture_path, phone, id } = props.user;
+  const { full_name, picture_path, phone, notes } = props.user;
 
-  console.log('pic',picture_path)
   return (
-    <View style={styles.container}>
-      <Image 
-        source={picture_path ? { uri: picture_path } : placeholder}
-        style={styles.image}
-      />
+    <>
+      <View style={styles.container}>
+        <Image 
+          source={picture_path ? { uri: picture_path } : placeholder}
+          style={styles.image}
+        />
 
-      <View style={{ flex: 1 }}>
-        <Text style={styles.name}>{full_name}</Text>
-        <Text >Teléfono: {phone}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.name}>{full_name}</Text>
+          <Text >Teléfono: {phone}</Text>
+        </View>
+
       </View>
-
-      <TouchableOpacity onPress={() => router.push(`/user/${id}/addAppointment?name=${full_name}`)}>
-        <Text style={styles.headerButton}>agregar consulta</Text>
-      </TouchableOpacity>
-    </View>
+      {notes && <View style={styles.notes}><Text style={{fontWeight: '300'}}>{notes}</Text></View>}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
     container: { 
-        paddingHorizontal: 20,
+
         paddingVertical: 40, 
         flexDirection: 'row',
         alignItems: 'center', 
+    },
+    notes: {
+      paddingHorizontal: 40,
+      paddingVertical: 20, 
     },
     image: { 
         backgroundColor: 'lightgrey',
