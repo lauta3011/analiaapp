@@ -8,6 +8,7 @@ import HorizontalLine from '@/components/atoms/HorizontalLine';
 import { EyelashDisplay } from '@/components/lists/EyelashDisplay';
 import { ModalForm } from '@/components/forms/ModalForm';
 import { EyelashDraw } from '@/components/forms/EyelashDraw';
+import UserDisplay from '@/components/molecules/UserDisplay';
 
 export default function UserDetails() {
   const { id } = useLocalSearchParams();
@@ -59,15 +60,17 @@ export default function UserDetails() {
   }, []);
 
   return (
-    <ScrollView style={{ paddingHorizontal: 45 }} scrollEnabled={!modal}>
-      <UserInfo user={user} />
-      <HorizontalLine />
-      {characteristics.length > 0 && <UserTags items={characteristics} title="Caracteristicas"/>}
-      {allergies.length > 0 && <UserTags items={allergies} title="Alergias"/>}
-      <HorizontalLine />
-      <EyelashDisplay drawing={drawing} selected={selectedImage} handleAddEyelash={() => setModal(true)} />
-
-      {modal && <ModalForm handleHide={() => setModal(false)}><EyelashDraw userId={id} confirmForm={() => { getLatestDrawing(); setModal(false) }} /></ModalForm>}
+    <ScrollView style={{ paddingHorizontal: 25 }} scrollEnabled={!modal}>
+      <UserDisplay 
+        user={user}
+        characteristics={characteristics} 
+        allergies={allergies} 
+        drawing={drawing} 
+        selectedImage={selectedImage}
+        modal={modal} 
+        id={id}
+      /> 
+      {/* // AGREGAR COMPONENTE QUE EDITE LOS INPUTS */}
     </ScrollView>
   );
 }

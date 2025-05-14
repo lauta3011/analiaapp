@@ -9,10 +9,11 @@ import { useFormStore } from "@/store/form";
 import { ConfirmButton } from "../atoms/ConfirmButton";
 import { NotificationPopup } from "./NotificationPopup";
 import { Text } from "react-native-paper";
+import Toast from "react-native-toast-message";
 
 export const NewClientForm = (props: any) => {
   const { allergies, characteristics, setAllergy, setCharacteristic, fetchAllergies, fetchCharacteristics } = useTagsStore();
-  const { serError, confirmUser, resetSuccess, loading: formLoading, errors, success } = useFormStore();
+  const { confirmUser, loading: formLoading } = useFormStore();
   // TODO add types 
   const [person, setPerson] = useState({
     fullName: '',
@@ -27,14 +28,12 @@ export const NewClientForm = (props: any) => {
   }
 
   useEffect(() => {
-    resetSuccess();
     fetchData();
   }, []);
 
   const handleSubmit = () => {
     let formData;
     if (person.fullName && person.phone) {
-      serError('');
       formData = {
         ...person,
         picture,
@@ -43,7 +42,11 @@ export const NewClientForm = (props: any) => {
       }
       confirmUser(formData);
     } else {
-      serError('hay campos vacios');
+      Toast.show({
+        type: 'error',
+        text1: 'Informacion necesaria',
+        text2: 'Nombre o Nro de telefono vacios',
+      });
     }
   }
   
@@ -63,8 +66,6 @@ export const NewClientForm = (props: any) => {
           <TextBox number={false} setValue={(value: string) => setPerson((prevForm) => ({...prevForm, notes: value}))} label="nota o detalle por escrito" value={person.notes} />
         </View>
 
-        {errors.msg && <NotificationPopup isError={true} msg={errors.msg} />}
-        {success && <NotificationPopup isError={false} />}
         <ConfirmButton loading={formLoading} handleSubmit={() => handleSubmit()} label="agregar cliente" />
     </View>
   );

@@ -37,7 +37,7 @@ export const EyelashDisplay = (props: any) => {
                 </View>
                 
                 <View>
-                    <Button onPress={() => props.handleAddEyelash()} mode='contained'>actualizar sesion</Button>
+                    <Button onPress={() => props.handleAddEyelash()} mode='contained'>actualizar dibujo</Button>
                 </View>
             </View>
         </View>
@@ -46,7 +46,11 @@ export const EyelashDisplay = (props: any) => {
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 15
+        marginVertical: 25,
+        padding: 8,
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: 'lightgrey'
     },
     title: {
         fontSize: 26,

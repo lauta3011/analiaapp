@@ -1,18 +1,13 @@
 import { addNewUser } from '@/bff';
+import Toast from 'react-native-toast-message';
 import { create } from 'zustand';
  
 interface FormStore {
-    success: boolean,
-    errors: { msg: string | null },
     loading: boolean,
     confirmUser: (form: object) => void,
-    resetSuccess: () => void,
-    serError: (error: string) => void
 }
 
 export const useFormStore = create<FormStore>((set) => ({
-    success: false,
-    errors: { msg: null },
     loading: false,
     ///// TODO FORM TYPES
     confirmUser: async (form: any) => {
@@ -20,16 +15,27 @@ export const useFormStore = create<FormStore>((set) => ({
         const { allergies, characteristics, fullName, phone, picture, notes } = form;
         try {
             await addNewUser({ fullName, phone, picture, notes, allergies, characteristics }).then(() => {
-                set({ success: true });
+                Toast.show({
+                    type: 'success',
+                    text1: 'Usuario agregado',
+                    text2: 'La operación se completó con éxito',
+                });
             })
         } catch (error: any) {
-            set({ errors: { msg: error.message }})
+            Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'No fue posible agregar el usuario',
+            });
         } finally {
             set({ loading: false });
         }
     },
-    resetSuccess: () => set({ success: false }),
     serError: (error: string) => {
-        set({ errors: { msg: error } })
+        Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: error,
+        });
     }
 }))
