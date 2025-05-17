@@ -25,6 +25,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   headingContainer: {
+    backgroundColor: '#c8778a',
     padding: 28,
   },
   heading: {
@@ -34,6 +35,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
+    color: '#ffff',
     fontWeight: 200,
     textAlign: 'justify'
   },

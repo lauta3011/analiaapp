@@ -19,7 +19,7 @@ const ToastConfig = {
   success: (props: any) => (
     <BaseToast
       {...props}
-      style={{ backgroundColor: '#d4eb83' }}
+      style={{ backgroundColor: '#3cba9f' }}
       contentContainerStyle={{ paddingHorizontal: 15 }}
       text1Style={toastStyles.title}
       text2Style={toastStyles.message}

@@ -9,11 +9,12 @@ type ImageKey = keyof typeof EYELASHES_MAP;
 export const EyelashDisplay = (props: any) => {
     const drawing = props.drawing;
     const selected: ImageKey = props.selected;
+    const notes = props.notes == '' ? null : props.notes;
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Ultima sesion</Text>
-            <Text style={styles.text}>de tener informacion guardada de la ultima sesion con el cliente se mostrara aqui y podras actualizarla o agregar nueva info en caso de ser la primera vez</Text>
+            <Text style={styles.text}>{notes ?? "de tener informacion guardada de la ultima sesion con el cliente se mostrara aqui y podras actualizarla o agregar nueva info en caso de ser la primera vez"}</Text>
             
             <View style={styles.innerContainer}>
                 <View style={styles.imageWrapper}>
@@ -37,7 +38,7 @@ export const EyelashDisplay = (props: any) => {
                 </View>
                 
                 <View>
-                    <Button onPress={() => props.handleAddEyelash()} mode='contained'>actualizar dibujo</Button>
+                    <Button onPress={() => props.openModal()} mode='contained'>actualizar sesion</Button>
                 </View>
             </View>
         </View>

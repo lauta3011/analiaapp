@@ -3,7 +3,7 @@ import { View, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter, Slot } from 'expo-router';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-const Layout = ({ children }: any) => {
+const Layout = () => {
   const router = useRouter();
 
   return (
@@ -20,7 +20,7 @@ const Layout = ({ children }: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "grey",
+    backgroundColor: "#c8778a",
     paddingHorizontal: 20,
     paddingVertical: 10
   }

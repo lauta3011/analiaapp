@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabaseAsync("db-v4.db");
+const db = SQLite.openDatabaseAsync("db-v5.db");
 
 const initializeDB = async () => {
     try {
@@ -29,6 +29,7 @@ const initializeDB = async () => {
                 id_user INTEGER,
                 type INTEGER NOT NULL,
                 data TEXT NOT NULL,
+                notes TEXT,
                 dateCreated TEXT DEFAULT (datetime('now')),
                 FOREIGN KEY (id_user) REFERENCES USER(id_user) ON DELETE CASCADE           
             )
@@ -164,6 +165,36 @@ export const fetchDrawing = async (user: number) => {
     }
   };
 
+export const updateUser = async (user: any) => {
+    const { id, full_name, notes, phone, picture_path } = user;
+    const database = await db;
+    
+    let statement: SQLite.SQLiteStatement = await database.prepareAsync(
+        `UPDATE USER
+        SET full_name = $full_name,
+            phone = $phone,
+            notes = $notes,
+            picture_path = $picture_path
+        WHERE id = $id`
+    )
+
+    try {
+        const result = await statement.executeAsync({
+            $full_name: full_name,
+            $phone: phone,
+            $notes: notes,
+            $id: id,
+            $picture_path: picture_path
+        });
+        return result;
+    } catch (error) {
+        console.log('error', error);
+        throw error;
+    } finally {
+        await statement.finalizeAsync();
+    }
+}
+
 export const postUser = async (user: any) => {
     const { fullName: full_name, phone, picture: picture_path, notes } = user;
     const database = await db;
@@ -184,15 +215,15 @@ export const postUser = async (user: any) => {
 };
 
 export const addDrawing = async (drawingInfo: any) => {
-    const { userId: id_user , selected: type, drawing: data } = drawingInfo;
+    const { userId: id_user , selected: type, drawing: data, notes } = drawingInfo;
     const database = await db;
 
     let statement: SQLite.SQLiteStatement = await database.prepareAsync(
-        'INSERT INTO EYELASH_DRAWING (id_user, type, data) VALUES ($id_user, $type, $data)'
+        'INSERT INTO EYELASH_DRAWING (id_user, type, data, notes) VALUES ($id_user, $type, $data, $notes)'
     );
 
     try {
-        const result = await statement.executeAsync({ $id_user: id_user, $type: type, $data: data });
+        const result = await statement.executeAsync({ $id_user: id_user, $type: type, $data: data, $notes: notes });
         return result.lastInsertRowId;
     } catch (error: any) {
         console.log('ERROR ', error)
@@ -227,28 +258,35 @@ export const associateAllergies = async (user: number, allergies: object[]) => {
 }
 
 export const associateCharacteristics = async (user: number, allergies: object[]) => {
-    const database = await db;
+  const database = await db;
 
-    try {
-        if (allergies.length > 0) {
-            const associationStatement = await database.prepareAsync(
-              'INSERT INTO CHARACTERISTIC_USER (id_user, id_characteristic) VALUES ($id_user, $id_characteristic)'
-            );
-            await Promise.all(
-                allergies.map(async (item: any) => {
-                await associationStatement.executeAsync({
-                  $id_user: user,
-                  $id_characteristic: item.id
-                });
-              })
-            );
-            await associationStatement.finalizeAsync();
-        }
-    } catch (error) {
-        console.error('Error en associateCharacteristics:', error);
-        return error;  
+  try {
+    await database.execAsync('BEGIN TRANSACTION');
+
+    if (allergies.length > 0) {
+      const associationStatement = await database.prepareAsync(
+        'INSERT INTO CHARACTERISTIC_USER (id_user, id_characteristic) VALUES ($id_user, $id_characteristic)'
+      );
+
+      await Promise.all(
+        allergies.map(async (item: any) => {
+          await associationStatement.executeAsync({
+            $id_user: user,
+            $id_characteristic: item.id
+          });
+        })
+      );
+
+      await associationStatement.finalizeAsync();
     }
-}
+
+    await database.execAsync('COMMIT');
+  } catch (error) {
+    console.error('Error en associateCharacteristics:', error);
+    await database.execAsync('ROLLBACK');
+    throw error;
+  }
+};
 
 export const postAllergy = async (name: any) => {
     const database = await db;

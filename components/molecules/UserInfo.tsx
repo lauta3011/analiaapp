@@ -1,47 +1,105 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Image, Text, StyleSheet } from 'react-native';
+import { Button } from 'react-native-paper';
 
-const placeholder = require('@/assets/images/placeholder.png')
+import TextBox from '../atoms/TextBox';
+import UserEdit from './UserEdit';
+import UserDisplay from './UserDisplay';
+import ImageInput from '../atoms/ImageInput';
+import { useFormStore } from '@/store/form';
 
-export default function UserInfo(props: any) {
+const placeholder = require('@/assets/images/placeholder.png');
+
+const UserInfo = (props: any) => {
   const { full_name, picture_path, phone, notes } = props.user;
+  const { loading } = useFormStore();
 
+  const [editView, setEditView] = useState(false);
+  const [editName, setEditName] = useState(full_name ?? '');
+  const [editNotes, setEditNotes] = useState(notes ?? '');
+  const [editPhone, setEditPhone] = useState(phone ?? '');
+  const [editPicture, setEditPicture] = useState(picture_path);
+
+  useEffect(() => {
+    if (props.user) {
+      setEditName(props.user.full_name);
+      setEditPhone(props.user.phone);
+      setEditNotes(props.user.notes);
+    }
+  }, [props.user]);
+
+  const prepareUpdate = () => {
+    const form = {
+      full_name: editName,
+      phone: editPhone,
+      notes: editNotes,
+      picture_path: editPicture ?? picture_path
+    }
+
+    props.handleUpdate(form)
+  }
   return (
-    <>
+    <View style={{ marginVertical: 25 }}>
       <View style={styles.container}>
+        {editView ? <ImageInput prevImage={picture_path} selectedImage={(img: any) => setEditPicture(img)} /> : 
         <Image 
           source={picture_path ? { uri: picture_path } : placeholder}
           style={styles.image}
-        />
+        />}
 
-        <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{full_name}</Text>
-          <Text >Teléfono: {phone}</Text>
-        </View>
-
+        {editView ? (
+          <UserEdit
+            name={editName}
+            phone={editPhone}
+            setName={(val: string) => setEditName(val)}
+            setPhone={(val: number) => setEditPhone(val)}
+          />
+        ) : (
+          <UserDisplay full_name={full_name} phone={phone} />
+        )}
       </View>
-      {notes && <View style={styles.notes}><Text style={{fontWeight: '300'}}>{notes}</Text></View>}
-    </>
+
+      <View style={{ marginVertical: 15 }}>
+        {editView ? (
+          <TextBox
+            label="notas"
+            number={false}
+            setValue={setEditNotes}
+            value={editNotes}
+          />
+        ) : (
+          notes && <Text style={{ fontWeight: '300' }}>{notes}</Text>
+        )}
+      </View>
+
+      {!editView ? (
+        <Button loading={loading} mode="contained" onPress={() => setEditView(true)}>
+          editar usuario
+        </Button>
+      ) : (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+          <Button mode="text" onPress={() => setEditView(false)}>cancelar</Button>
+          <Button mode="contained" onPress={() => { prepareUpdate(); setEditView(false)}}>confirmar</Button>
+        </View>
+      )}
+    </View>
   );
 };
 
+export default UserInfo;
+
 const styles = StyleSheet.create({
     container: { 
-
-        paddingVertical: 40, 
-        flexDirection: 'row',
+      marginVertical: 15,
+      flexDirection: 'row',
         alignItems: 'center', 
-    },
-    notes: {
-      paddingHorizontal: 40,
-      paddingVertical: 20, 
     },
     image: { 
         backgroundColor: 'lightgrey',
         width: 90, 
         height: 90, 
         borderRadius: 50, 
-        marginRight: 15 
+        marginRight: 15
     },
     name: { 
       marginBottom: 5,

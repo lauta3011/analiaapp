@@ -55,7 +55,10 @@ const Canvas = (props: any) => {
           })}
         </Svg>
       </View>
-      <Button onPress={() => formatPaths(paths)} mode='contained'>confirmar</Button>
+      <View style={styles.buttons}>
+        <Button onPress={() => props.handleHide()} mode='text'>cancelar</Button>
+        <Button onPress={() => formatPaths(paths)} mode='contained'>confirmar</Button>
+      </View>
     </>
   );
 };
@@ -69,6 +72,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
     margin: 10
+  },
+  buttons : {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    width: '60%'
   }
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import CheckButton from "../atoms/CheckButton";
 import { Button, Text } from "react-native-paper";
@@ -6,18 +6,15 @@ import { Button, Text } from "react-native-paper";
 export const TagsList = (props: any) => {
     const { list, title, subText, handleModal, handleAction, type, label } = props;
 
-    useEffect(() => { }, [list])
     return (
-        <View style={styles.innerContainer}>
-            <View style={styles.textContainer}>
-                <Text style={styles.subHeading}>{title}</Text>
-                <Text style={styles.subText}>{subText}</Text>
-            </View>
+        <View>
+            <Text style={styles.subHeading}>{title}</Text>
+            {subText && <Text style={styles.subText}>{subText}</Text>}
 
             <View style={styles.listContainer}>
                 {list.map((item: any, index: number) => {
                 return (
-                    <CheckButton number={false} key={index} setValue={() => handleAction(item.id)} label={item.name} value={item.value} />
+                    <CheckButton key={index} setValue={() => handleAction(item.id)} label={item.name} value={item.value} />
                 )
                 })}
                 <View style={{ margin: 5}}>
@@ -38,12 +35,10 @@ const styles = StyleSheet.create({
         padding: 5
     },
     subHeading: {
-        fontSize: 23,
-        fontWeight: 'thin'
+        fontSize: 26,
+        fontWeight: '400',
+        marginVertical: 5
       },
-    innerContainer: {
-        marginTop: 10
-    },
     listContainer: {
         display:'flex',
         flexDirection: 'row', 

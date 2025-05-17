@@ -3,10 +3,9 @@ import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { useFormStore } from '@/store/form';
 
-const ProfilePicture = (props: any) => {
-  const [profileImage, setProfileImage] = useState(null);
+const ImageInput = (props: any) => {
+  const [profileImage, setProfileImage] = useState(props.prevImage);
 
   const handleTakePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -47,9 +46,10 @@ const ProfilePicture = (props: any) => {
 
 const styles = StyleSheet.create({
   container: {
+    display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
     marginVertical: 20,
+    marginHorizontal: 10
   },
   imageContainer: {
     width: 120,
@@ -68,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfilePicture;
+export default ImageInput;

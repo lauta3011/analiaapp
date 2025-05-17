@@ -22,7 +22,7 @@ export default function ListHeading(props: any) {
     return (
         <View>            
             <TouchableOpacity onPress={() => setShowList(!showList)}>
-                <View style={{...styles.container, backgroundColor: isOdd ? 'grey' : 'black'}}>
+                <View style={{...styles.container, backgroundColor: isOdd ? '#f2d5da' : '#e8b6c2'}}>
                     <View>
                         <Text style={styles.letter}>{props.letter}</Text>
                     </View>
@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     },
     letter: {
-        color: '#fff',
-        fontWeight: 200,
+        color: '#c8778a',
+        fontWeight: 300,
         fontSize:64,
     }
 })

@@ -18,14 +18,12 @@ export const TagForm = (props: any) => {
         <>
             <Text style={styles.text}>{`Agregar ${props.label}`}</Text>
             <TextBox number={false} setValue={(value: string) => setNewItem(value)} label={`nombre de ${props.label}`} value={newItem} />
-            <View style={styles.button}>
-                <Button loading={loading} icon={"plus"} mode={"contained"} onPress={() => handleAdd()}>
-                    agregar
-                </Button>
-            </View>
-            <View style={styles.button}>
+            <View style={styles.buttons}>
                 <Button mode={"text"} onPress={() => props.handleHide()}>
                     {`cancelar`}
+                </Button>
+                <Button loading={loading} icon={"plus"} mode={"contained"} onPress={() => handleAdd()}>
+                    agregar
                 </Button>
             </View>
         </>
@@ -37,7 +35,10 @@ const styles = StyleSheet.create({
         fontSize: 28,
         margin: 5
     },
-    button: {
-        marginTop: 10
+    buttons: {
+        margin: 25,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly'
     }
 });

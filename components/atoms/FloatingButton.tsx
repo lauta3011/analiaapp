@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
         width: 60, // Ancho del botón
         height: 60, // Alto del botón
         borderRadius: 30, // Redondear el botón para hacerlo circular
-        backgroundColor: '#FF6347',
+        backgroundColor: '#c8778a',
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 10, 

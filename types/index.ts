@@ -4,7 +4,7 @@ export interface FormAtom<T> {
     value?: T, 
     setValue: any, 
     error?: boolean, 
-    number: boolean
+    number?: boolean
 }
 
 export interface NewClient {
