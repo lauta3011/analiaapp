@@ -74,7 +74,7 @@ export default function UserDetails() {
 
   return (
     <>
-      <ScrollView  style={{ paddingHorizontal: 25 }} >
+      <ScrollView  style={{ paddingHorizontal: 25, backgroundColor: '#fff' }} >
         <UserInfo user={user} handleUpdate={(form: any) => updateUserData(form)}/>
         
         {characteristics?.length > 0 && <UserTags items={characteristics} title="Caracteristicas"/>}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { useRouter } from 'expo-router';
 import { ABC } from '@/constants/alphabteth';
 import ListHeading from '@/components/lists/ListHeading';
@@ -10,7 +9,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   return (
-    <View style={{position: 'relative', flex: 1}}>
+    <View style={styles.container}>
       <FloatingButton handleAction={() => router.push('/user/addClient')} />
 
       <View style={styles.headingContainer}>
@@ -24,6 +23,11 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    position: 'relative', 
+    flex: 1, 
+    backgroundColor:'white'
+  },
   headingContainer: {
     backgroundColor: '#c8778a',
     padding: 28,

@@ -6,7 +6,7 @@ import Toast from "react-native-toast-message";
 
 export default function AddClient() {
     return (
-        <View>
+        <View style={{ backgroundColor: '#fff' }}>
             <NewClientForm />
             <Toast config={ToastConfig} visibilityTime={5000} />
         </View>

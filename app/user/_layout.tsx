@@ -7,7 +7,7 @@ const Layout = () => {
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
         <TouchableOpacity onPress={() => router.back()}>
           <Icon name="leftcircleo" size={30} color="#FFF"/> 
