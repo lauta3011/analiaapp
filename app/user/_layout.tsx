@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useRouter, Slot } from 'expo-router';
-import Icon from 'react-native-vector-icons/AntDesign';
+import { IconButton } from 'react-native-paper';
 
 const Layout = () => {
   const router = useRouter();
@@ -9,9 +9,12 @@ const Layout = () => {
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Icon name="leftcircleo" size={30} color="#FFF"/> 
-        </TouchableOpacity>
+        <IconButton
+          icon="arrow-left-circle-outline"
+          iconColor="#FFF"
+          size={30}
+          onPress={() => router.back()}
+        />
       </View>
       <Slot />
     </View>

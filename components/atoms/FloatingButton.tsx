@@ -1,12 +1,16 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import Icon from "react-native-vector-icons/AntDesign";
+import { StyleSheet } from "react-native";
+import { IconButton } from "react-native-paper";
 
 export default function AddClientButton(props: any) {
     return (
-        <TouchableOpacity onPress={props.handleAction} style={styles.floatingButton} >
-            <Icon name="pluscircleo" size={30} color="#fff" />
-        </TouchableOpacity>
+        <IconButton
+            icon="plus-circle-outline"
+            iconColor="#fff"
+            size={30}
+            onPress={props.handleAction}
+            style={styles.floatingButton}
+        />
     );
 };
     

@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import Icon from 'react-native-vector-icons/AntDesign';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, useRouter } from "expo-router";
 
 export default function NameList(props: any) {
@@ -17,7 +17,7 @@ export default function NameList(props: any) {
                       <Pressable>
                         <View style={styles.itemContainer}>
                           <Text style={styles.name}>{item.full_name}</Text>
-                          <Icon name="arrowright" size={20} color="#000" />
+                          <MaterialCommunityIcons name="arrow-right" size={20} color="#000" />
                         </View>
                       </Pressable>
                     </Link>
