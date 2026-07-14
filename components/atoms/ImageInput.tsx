@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
@@ -37,7 +37,7 @@ const ImageInput = (props: any) => {
         {profileImage ? (
           <Image source={{ uri: profileImage }} style={styles.image} />
         ) : (
-          <Ionicons name="person" size={60} color="#6e6e6e" />
+          <MaterialCommunityIcons name="account" size={60} color="#6e6e6e" />
         )}
       </TouchableOpacity>
     </View>

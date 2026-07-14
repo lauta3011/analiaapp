@@ -1,5 +1,5 @@
 import { associateAllergies, associateCharacteristics, postUser } from '@/database/database';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const storePicture = async (uri: string) => {
     const fileName = uri.split('/').pop();
