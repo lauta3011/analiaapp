@@ -13,3 +13,14 @@ export interface NewClient {
     allergies: object[];
     otherDetails: string;
   }
+
+export interface Appointment {
+    id: number;
+    id_user: number;
+    date: string;
+    time: string | null;
+    title: string;
+    notes: string | null;
+    status: string;
+    full_name: string;
+}
