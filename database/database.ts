@@ -63,6 +63,20 @@ const initializeDB = async () => {
                 FOREIGN KEY (id_characteristic) REFERENCES CHARACTERISTIC(id_characteristic) ON DELETE CASCADE
             )    
         `)
+
+        await database.execAsync(`
+            CREATE TABLE IF NOT EXISTS APPOINTMENT (
+                id INTEGER PRIMARY KEY NOT NULL,
+                id_user INTEGER NOT NULL,
+                date TEXT NOT NULL,
+                time TEXT,
+                title TEXT NOT NULL,
+                notes TEXT,
+                status TEXT DEFAULT 'pending',
+                dateCreated TEXT DEFAULT (datetime('now')),
+                FOREIGN KEY (id_user) REFERENCES USER(id) ON DELETE CASCADE
+            )
+        `)
         console.log("Base de datos inicializada correctamente");
     } catch (error) {
         console.error("Error al inicializar la base de datos:", error);
@@ -313,6 +327,102 @@ export const postCharacteristic = async (name: any) => {
         return result.lastInsertRowId;
     } catch (error) {
         console.error('Error en addAlergy:', error);
+    } finally {
+        await statement.finalizeAsync();
+    }
+};
+
+export const fetchAppointmentsForDate = async (date: string) => {
+    const database = await db;
+    try {
+        const appointments = await database.getAllAsync(
+            `SELECT a.*, u.full_name 
+             FROM APPOINTMENT a 
+             JOIN USER u ON a.id_user = u.id 
+             WHERE a.date = $date 
+             ORDER BY a.time ASC`,
+            { $date: date }
+        );
+        return appointments;
+    } catch (error) {
+        console.error('Error al buscar citas:', error);
+        throw error;
+    }
+};
+
+export const fetchAppointmentsForMonth = async (year: number, month: number) => {
+    const database = await db;
+    try {
+        const monthStr = month.toString().padStart(2, '0');
+        const startDate = `${year}-${monthStr}-01`;
+        const endDate = `${year}-${monthStr}-31`;
+        const appointments = await database.getAllAsync(
+            `SELECT a.*, u.full_name 
+             FROM APPOINTMENT a 
+             JOIN USER u ON a.id_user = u.id 
+             WHERE a.date >= $startDate AND a.date <= $endDate
+             ORDER BY a.date ASC, a.time ASC`,
+            { $startDate: startDate, $endDate: endDate }
+        );
+        return appointments;
+    } catch (error) {
+        console.error('Error al buscar citas del mes:', error);
+        throw error;
+    }
+};
+
+export const fetchAllAppointments = async () => {
+    const database = await db;
+    try {
+        const appointments = await database.getAllAsync(
+            `SELECT a.*, u.full_name 
+             FROM APPOINTMENT a 
+             JOIN USER u ON a.id_user = u.id 
+             ORDER BY a.date ASC, a.time ASC`
+        );
+        return appointments;
+    } catch (error) {
+        console.error('Error al buscar todas las citas:', error);
+        throw error;
+    }
+};
+
+export const postAppointment = async (appointment: any) => {
+    const { id_user, date, time, title, notes } = appointment;
+    const database = await db;
+
+    const statement: SQLite.SQLiteStatement = await database.prepareAsync(
+        'INSERT INTO APPOINTMENT (id_user, date, time, title, notes) VALUES ($id_user, $date, $time, $title, $notes)'
+    );
+
+    try {
+        const result = await statement.executeAsync({
+            $id_user: id_user,
+            $date: date,
+            $time: time || null,
+            $title: title,
+            $notes: notes || null
+        });
+        return result.lastInsertRowId;
+    } catch (error: any) {
+        console.error('Error al crear cita:', error);
+        throw new Error(error);
+    } finally {
+        await statement.finalizeAsync();
+    }
+};
+
+export const deleteAppointment = async (id: number) => {
+    const database = await db;
+    const statement: SQLite.SQLiteStatement = await database.prepareAsync(
+        'DELETE FROM APPOINTMENT WHERE id = $id'
+    );
+
+    try {
+        await statement.executeAsync({ $id: id });
+    } catch (error) {
+        console.error('Error al eliminar cita:', error);
+        throw error;
     } finally {
         await statement.finalizeAsync();
     }
