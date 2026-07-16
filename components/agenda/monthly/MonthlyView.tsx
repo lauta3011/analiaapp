@@ -18,26 +18,36 @@ interface MonthlyViewProps {
 
 const MONTH_NAMES = CALENDAR_LOCALE.config.monthNames;
 
-const generateMonthGrid = (year: number, month: number): (number | null)[] => {
+interface GridCell {
+    day: number;
+    year: number;
+    month: number;
+}
+
+const generateMonthGrid = (year: number, month: number): (GridCell | null)[] => {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const startDayOfWeek = firstDay.getDay();
     const daysInMonth = lastDay.getDate();
 
-    const grid: (number | null)[] = [];
+    const grid: (GridCell | null)[] = [];
 
     const prevMonthLastDay = new Date(year, month, 0).getDate();
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevMonthYear = month === 0 ? year - 1 : year;
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
-        grid.push(prevMonthLastDay - i);
+        grid.push({ day: prevMonthLastDay - i, year: prevMonthYear, month: prevMonth });
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
-        grid.push(d);
+        grid.push({ day: d, year, month });
     }
 
+    const nextMonth = month === 11 ? 0 : month + 1;
+    const nextMonthYear = month === 11 ? year + 1 : year;
     const remaining = 42 - grid.length;
     for (let d = 1; d <= remaining; d++) {
-        grid.push(d);
+        grid.push({ day: d, year: nextMonthYear, month: nextMonth });
     }
 
     return grid;
@@ -69,7 +79,7 @@ export const MonthlyView = ({
     }, []);
 
     const weeks = useMemo(() => {
-        const result: (number | null)[][] = [];
+        const result: (GridCell | null)[][] = [];
         for (let i = 0; i < grid.length; i += 7) {
             result.push(grid.slice(i, i + 7));
         }
@@ -88,11 +98,11 @@ export const MonthlyView = ({
             <View style={styles.grid}>
                 {weeks.map((week, weekIndex) => (
                     <View key={weekIndex} style={styles.row}>
-                        {week.map((day, dayIndex) => {
-                            if (day === null) return <View key={dayIndex} style={styles.cell} />;
+                        {week.map((cell, dayIndex) => {
+                            if (cell === null) return <View key={dayIndex} style={styles.cell} />;
 
-                            const isCurrentMonth = day >= 1 && day <= new Date(year, month + 1, 0).getDate();
-                            const dateStr = toDateStr(year, month, day);
+                            const isCurrentMonth = cell.year === year && cell.month === month;
+                            const dateStr = toDateStr(cell.year, cell.month, cell.day);
                             const isToday = dateStr === todayStr;
                             const isSelected = dateStr === selectedDate;
                             const appointments = items[dateStr] || [];
@@ -100,7 +110,7 @@ export const MonthlyView = ({
                             return (
                                 <DayCell
                                     key={dayIndex}
-                                    day={day}
+                                    day={cell.day}
                                     date={dateStr}
                                     isCurrentMonth={isCurrentMonth}
                                     isToday={isToday}

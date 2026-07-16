@@ -44,10 +44,20 @@ export const DailyView = ({
                 if (hour >= HOURS_START && hour <= HOURS_END && map[hour]) {
                     map[hour].push(apt);
                 }
+            } else {
+                map[HOURS_START].push(apt);
             }
         });
         return map;
     }, [dayAppointments]);
+
+    const isToday = useMemo(() => {
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+        return selectedDate === todayStr;
+    }, [selectedDate]);
+
+    const currentHour = useMemo(() => new Date().getHours(), []);
 
     const dayOfWeek = DAY_NAMES[currentDate.getDay()];
     const monthName = MONTH_NAMES[currentDate.getMonth()];
@@ -70,6 +80,7 @@ export const DailyView = ({
                 <HourRow
                     key={hour}
                     hour={hour}
+                    isCurrentHour={isToday && hour === currentHour}
                     appointments={appointmentsByHour[hour]}
                     onDeleteAppointment={onDeleteAppointment}
                     onAddAppointment={onAddAppointment}

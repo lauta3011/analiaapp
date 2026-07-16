@@ -15,12 +15,15 @@ interface DayCellProps {
 
 const getGradientColor = (count: number): string => {
     if (count === 0) return 'transparent';
-    const index = Math.min(count, PINK_GRADIENT.length - 1);
-    return PINK_GRADIENT[index];
+    if (count <= 2) return PINK_GRADIENT[1];
+    if (count <= 4) return PINK_GRADIENT[2];
+    if (count <= 6) return PINK_GRADIENT[3];
+    if (count <= 9) return PINK_GRADIENT[4];
+    return PINK_GRADIENT[5];
 };
 
 const isDarkBackground = (count: number): boolean => {
-    return count >= 4;
+    return count >= 7;
 };
 
 export const DayCell = ({

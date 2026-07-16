@@ -3,6 +3,9 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Stack, useRouter, usePathname } from 'expo-router';
 import { IconButton } from 'react-native-paper';
 import { COLORS } from '@/constants';
+import { AppModal } from '@/components/modals/AppModal';
+import Toast from 'react-native-toast-message';
+import ToastConfig from '@/components/atoms/ToastConfig';
 
 const RootLayout = () => {
     const router = useRouter();
@@ -48,6 +51,8 @@ const RootLayout = () => {
                     contentStyle: { backgroundColor: '#fff' },
                 }}
             />
+            <AppModal />
+            <Toast config={ToastConfig} visibilityTime={4000} />
         </View>
     );
 };

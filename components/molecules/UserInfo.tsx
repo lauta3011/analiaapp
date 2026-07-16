@@ -7,6 +7,7 @@ import UserEdit from './UserEdit';
 import UserDisplay from './UserDisplay';
 import ImageInput from '../atoms/ImageInput';
 import { useFormStore } from '@/store/form';
+import { COLORS } from '@/constants';
 
 const placeholder = require('@/assets/images/placeholder.png');
 
@@ -39,7 +40,7 @@ const UserInfo = (props: any) => {
     props.handleUpdate(form)
   }
   return (
-    <View style={{ marginVertical: 25 }}>
+    <View style={styles.wrapper}>
       <View style={styles.container}>
         {editView ? <ImageInput prevImage={picture_path} selectedImage={(img: any) => setEditPicture(img)} /> : 
         <Image 
@@ -59,7 +60,7 @@ const UserInfo = (props: any) => {
         )}
       </View>
 
-      <View style={{ marginVertical: 15 }}>
+      <View style={styles.notesContainer}>
         {editView ? (
           <TextBox
             label="notas"
@@ -68,18 +69,22 @@ const UserInfo = (props: any) => {
             value={editNotes}
           />
         ) : (
-          notes && <Text style={{ fontWeight: '300' }}>{notes}</Text>
+          notes && <Text style={styles.notesText}>{notes}</Text>
         )}
       </View>
 
       {!editView ? (
-        <Button loading={loading} mode="contained" onPress={() => setEditView(true)}>
-          editar usuario
+        <Button loading={loading} mode="contained" onPress={() => setEditView(true)} style={styles.editButton}>
+          Editar usuario
         </Button>
       ) : (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-          <Button mode="text" onPress={() => setEditView(false)}>cancelar</Button>
-          <Button mode="contained" onPress={() => { prepareUpdate(); setEditView(false)}}>confirmar</Button>
+        <View style={styles.buttonRow}>
+          <Button mode="outlined" onPress={() => setEditView(false)} style={styles.cancelButton}>
+            Cancelar
+          </Button>
+          <Button mode="contained" onPress={() => { prepareUpdate(); setEditView(false)}} style={styles.confirmButton}>
+            Confirmar
+          </Button>
         </View>
       )}
     </View>
@@ -89,27 +94,42 @@ const UserInfo = (props: any) => {
 export default UserInfo;
 
 const styles = StyleSheet.create({
+    wrapper: {
+      marginVertical: 25,
+    },
     container: { 
       marginVertical: 15,
       flexDirection: 'row',
-        alignItems: 'center', 
+      alignItems: 'center', 
     },
     image: { 
-        backgroundColor: 'lightgrey',
+        backgroundColor: COLORS.primaryLight,
         width: 90, 
         height: 90, 
         borderRadius: 50, 
-        marginRight: 15
+        marginRight: 15,
     },
-    name: { 
-      marginBottom: 5,
-        fontSize: 23, 
-        fontWeight: 'bold' ,
+    notesContainer: {
+      marginVertical: 15,
     },
-    headerButton: { 
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 15,
-        color: '#fff' 
-    }
+    notesText: {
+      fontWeight: '300',
+      color: COLORS.text,
+    },
+    editButton: {
+      backgroundColor: COLORS.primary,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    cancelButton: {
+      flex: 1,
+      marginRight: 8,
+    },
+    confirmButton: {
+      flex: 1,
+      marginLeft: 8,
+      backgroundColor: COLORS.primary,
+    },
 });

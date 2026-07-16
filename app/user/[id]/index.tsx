@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { fetchDrawing, fetchSingleUser, fetchUserAllergies, fetchUserCharacteristics } from '@/database/database';
 import UserInfo from '@/components/molecules/UserInfo';
-import HorizontalLine from '@/components/atoms/HorizontalLine';
-import { ModalForm } from '@/components/forms/ModalForm';
 import UserTags from '@/components/lists/UserTags';
-import { EyelashDraw } from '@/components/forms/EyelashDraw';
 import { EyelashDisplay } from '@/components/lists/EyelashDisplay';
 import { useFormStore } from '@/store/form';
-import Toast from 'react-native-toast-message';
-import ToastConfig from '@/components/atoms/ToastConfig';
+import { useModalStore } from '@/store/modal';
 
 export default function UserDetails() {
   const { id } = useLocalSearchParams();
@@ -22,7 +18,7 @@ export default function UserDetails() {
   const [notes, setNotes] = useState<any>();
   const [selectedImage, setSelectedImage] = useState(1);
 
-  const [modalSession, setModalSession] = useState(false);
+  const openModal = useModalStore((s) => s.openModal);
 
   const userID = parseInt(id as string);
 
@@ -73,22 +69,13 @@ export default function UserDetails() {
   }, []);
 
   return (
-    <>
-      <ScrollView  style={{ paddingHorizontal: 25, backgroundColor: '#fff' }} >
-        <UserInfo user={user} handleUpdate={(form: any) => updateUserData(form)}/>
-        
-        {characteristics?.length > 0 && <UserTags items={characteristics} title="Caracteristicas"/>}
-        {allergies?.length > 0 && <UserTags items={allergies} title="Alergias"/>}
+    <ScrollView  style={{ paddingHorizontal: 25, backgroundColor: '#fff' }} >
+      <UserInfo user={user} handleUpdate={(form: any) => updateUserData(form)}/>
+      
+      {characteristics?.length > 0 && <UserTags items={characteristics} title="Caracteristicas"/>}
+      {allergies?.length > 0 && <UserTags items={allergies} title="Alergias"/>}
 
-        <EyelashDisplay notes={notes} drawing={drawing} selected={selectedImage} openModal={() => setModalSession(true)} />
-      </ScrollView>
-
-      {modalSession && 
-        <ModalForm handleHide={() => setModalSession(false)}>
-            <EyelashDraw handleHide={() => setModalSession(false)} selectedImage={selectedImage} userId={id} confirmForm={() => { getLatestDrawing(); setModalSession(false) }} />
-        </ModalForm>}
-
-      <Toast config={ToastConfig} visibilityTime={5000} />
-    </>
+      <EyelashDisplay notes={notes} drawing={drawing} selected={selectedImage} openModal={() => openModal('eyelash-session', { selectedImage, userId: id, onConfirm: getLatestDrawing })} />
+    </ScrollView>
   );
 }

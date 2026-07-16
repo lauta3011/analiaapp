@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import TextBox from "../atoms/TextBox";
 import { Button } from "react-native-paper";
 import { useTagsStore } from "@/store/tags";
+import { COLORS } from "@/constants";
 
 export const TagForm = (props: any) => {
     const { loading, addNewTag } = useTagsStore();
@@ -16,14 +17,14 @@ export const TagForm = (props: any) => {
 
     return (
         <>
-            <Text style={styles.text}>{`Agregar ${props.label}`}</Text>
+            <Text style={styles.title}>{`Agregar ${props.label}`}</Text>
             <TextBox number={false} setValue={(value: string) => setNewItem(value)} label={`nombre de ${props.label}`} value={newItem} />
             <View style={styles.buttons}>
-                <Button mode={"text"} onPress={() => props.handleHide()}>
-                    {`cancelar`}
+                <Button mode="outlined" onPress={() => props.handleHide()} style={styles.cancelButton}>
+                    Cancelar
                 </Button>
-                <Button loading={loading} icon={"plus"} mode={"contained"} onPress={() => handleAdd()}>
-                    agregar
+                <Button loading={loading} icon={"plus"} mode="contained" onPress={() => handleAdd()} style={styles.submitButton}>
+                    Agregar
                 </Button>
             </View>
         </>
@@ -31,14 +32,26 @@ export const TagForm = (props: any) => {
 }
 
 const styles = StyleSheet.create({
-    text: {
-        fontSize: 28,
-        margin: 5
+    title: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.text,
+        marginTop: 12,
+        marginBottom: 4,
     },
     buttons: {
-        margin: 25,
-        display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-evenly'
-    }
+        justifyContent: 'space-between',
+        marginTop: 20,
+        marginBottom: 30,
+    },
+    cancelButton: {
+        flex: 1,
+        marginRight: 8,
+    },
+    submitButton: {
+        flex: 1,
+        marginLeft: 8,
+        backgroundColor: COLORS.primary,
+    },
 });

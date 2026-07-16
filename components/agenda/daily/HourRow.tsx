@@ -3,9 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { COLORS } from '@/constants';
 import { Appointment } from '@/types';
 import { AppointmentCard } from '@/components/atoms/AppointmentCard';
+import { useModalStore } from '@/store/modal';
 
 interface HourRowProps {
     hour: number;
+    isCurrentHour: boolean;
     appointments: Appointment[];
     onDeleteAppointment: (id: number, date: string) => void;
     onAddAppointment: (hour: number) => void;
@@ -17,23 +19,28 @@ const formatHour = (hour: number): string => {
 
 export const HourRow = ({
     hour,
+    isCurrentHour,
     appointments,
     onDeleteAppointment,
     onAddAppointment,
 }: HourRowProps) => {
+    const openModal = useModalStore((s) => s.openModal);
+
     return (
         <View style={styles.container}>
             <View style={styles.timeContainer}>
-                <Text style={styles.time}>{formatHour(hour)}</Text>
+                <Text style={[styles.time, isCurrentHour && styles.currentTime]}>{formatHour(hour)}</Text>
             </View>
 
             <View style={styles.content}>
+                {isCurrentHour && <View style={styles.nowMarker} />}
                 {appointments.length > 0 ? (
                     appointments.map((apt) => (
                         <AppointmentCard
                             key={apt.id}
                             appointment={apt}
                             onDelete={onDeleteAppointment}
+                            onPress={() => openModal('appointment-detail', { appointment: apt })}
                         />
                     ))
                 ) : (
@@ -65,12 +72,25 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: COLORS.textMuted,
     },
+    currentTime: {
+        color: COLORS.error,
+        fontWeight: '700',
+    },
     content: {
         flex: 1,
         borderLeftWidth: 1,
         borderLeftColor: COLORS.primaryLight,
         paddingLeft: 10,
         paddingVertical: 4,
+    },
+    nowMarker: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        borderTopWidth: 2,
+        borderTopColor: COLORS.error,
+        borderStyle: 'dotted',
     },
     emptySlot: {
         flex: 1,

@@ -3,6 +3,7 @@ import { EYELASHES_MAP } from '@/constants/eyelashes';
 import { ColorValue, Image, StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import Svg, { Path } from 'react-native-svg';
+import { COLORS } from '@/constants';
 
 type ImageKey = keyof typeof EYELASHES_MAP;
 
@@ -37,8 +38,8 @@ export const EyelashDisplay = (props: any) => {
                     </Svg>}
                 </View>
                 
-                <View>
-                    <Button onPress={() => props.openModal()} mode='contained'>actualizar sesion</Button>
+                <View style={styles.buttonContainer}>
+                    <Button onPress={() => props.openModal()} mode='contained' style={styles.updateButton}>Actualizar sesion</Button>
                 </View>
             </View>
         </View>
@@ -51,16 +52,19 @@ const styles = StyleSheet.create({
         padding: 8,
         borderWidth: 1,
         borderRadius: 10,
-        borderColor: 'lightgrey'
+        borderColor: COLORS.primaryLight,
     },
     title: {
-        fontSize: 26,
-        marginVertical: 5
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.text,
+        marginTop: 12,
+        marginBottom: 4,
     },
     text: {
         fontStyle: "italic", 
-        color: 'grey', 
-        padding: 5
+        color: COLORS.textMuted, 
+        padding: 5,
     },
     innerContainer: {
         display: 'flex',
@@ -70,13 +74,17 @@ const styles = StyleSheet.create({
     imageWrapper: {
         display:'flex', 
         justifyContent:'center', 
-        alignItems: 'center', 
+        alignItems:'center', 
         height: 400, 
         width: 400, 
         padding: 15,
         position: 'relative' 
     },
-    image: {
-        marginVertical: 25
+    buttonContainer: {
+        marginTop: 20,
+        marginBottom: 10,
+    },
+    updateButton: {
+        backgroundColor: COLORS.primary,
     },
 })

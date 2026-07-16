@@ -1,16 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
 import { ABC } from '@/constants/alphabteth';
+import { COLORS } from '@/constants';
 import ListHeading from '@/components/lists/ListHeading';
 import FloatingButton from '@/components/atoms/FloatingButton';
+import { useModalStore } from '@/store/modal';
 
 export default function ClientsScreen() {
-  const router = useRouter();
+  const openModal = useModalStore((s) => s.openModal);
 
   return (
     <View style={styles.container}>
-      <FloatingButton handleAction={() => router.push('/user/addClient')} />
+      <FloatingButton handleAction={() => openModal('add-client')} />
 
       <View style={styles.headingContainer}>
         <Text style={styles.text}>Tus clientes ordenados alfabéticamente según la inicial de su primer nombre.</Text>
@@ -26,20 +27,20 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative', 
     flex: 1, 
-    backgroundColor:'white'
+    backgroundColor: COLORS.background,
   },
   headingContainer: {
-    backgroundColor: '#c8778a',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
-    paddingVertical: 8
+    paddingVertical: 8,
   },
   text: {
     fontSize: 20,
-    color: '#ffff',
-    fontWeight: 200,
-    textAlign: 'justify'
+    color: '#fff',
+    fontWeight: '200',
+    textAlign: 'justify',
   },
   list: {
-    width: '100%'
-  }
+    width: '100%',
+  },
 })

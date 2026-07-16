@@ -6,16 +6,34 @@ import { Appointment } from '@/types';
 interface AppointmentCardProps {
     appointment: Appointment;
     onDelete: (id: number, date: string) => void;
+    onPress?: () => void;
+    compact?: boolean;
 }
 
-export const AppointmentCard = ({ appointment, onDelete }: AppointmentCardProps) => {
+export const AppointmentCard = ({ appointment, onDelete, onPress, compact }: AppointmentCardProps) => {
     const formatTime = (time: string | null) => {
         if (!time) return '';
         return time.substring(0, 5);
     };
 
+    if (compact) {
+        return (
+            <TouchableOpacity style={styles.compactContainer} onPress={onPress} activeOpacity={0.7}>
+                <Text style={[styles.compactClientName, !appointment.full_name && styles.clientNamePlaceholder]} numberOfLines={1}>
+                    {appointment.full_name || 'Sin cliente'}
+                </Text>
+                <Text style={styles.compactTitle} numberOfLines={2}>
+                    {appointment.title}
+                </Text>
+                <Text style={styles.compactTime}>
+                    {appointment.time ? formatTime(appointment.time) : ''}
+                </Text>
+            </TouchableOpacity>
+        );
+    }
+
     return (
-        <View style={styles.container}>
+        <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
             <View style={styles.timeContainer}>
                 <Text style={styles.time}>
                     {appointment.time ? formatTime(appointment.time) : '--:--'}
@@ -23,7 +41,9 @@ export const AppointmentCard = ({ appointment, onDelete }: AppointmentCardProps)
             </View>
 
             <View style={styles.content}>
-                <Text style={styles.clientName}>{appointment.full_name}</Text>
+                <Text style={[styles.clientName, !appointment.full_name && styles.clientNamePlaceholder]}>
+                    {appointment.full_name || 'Sin cliente'}
+                </Text>
                 <Text style={styles.title}>{appointment.title}</Text>
                 {appointment.notes ? (
                     <Text style={styles.notes} numberOfLines={2}>
@@ -38,7 +58,7 @@ export const AppointmentCard = ({ appointment, onDelete }: AppointmentCardProps)
             >
                 <MaterialCommunityIcons name="trash-can-outline" size={20} color="#c73e3e" />
             </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
 };
 
@@ -47,10 +67,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 12,
-        marginHorizontal: 10,
-        marginVertical: 4,
+        borderRadius: 10,
+        padding: 8,
+        marginHorizontal: 6,
+        marginVertical: 2,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
@@ -58,16 +78,16 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     timeContainer: {
-        width: 50,
+        width: 42,
         alignItems: 'center',
         justifyContent: 'center',
         borderRightWidth: 1,
         borderRightColor: '#e8b6c2',
-        paddingRight: 10,
-        marginRight: 10,
+        paddingRight: 8,
+        marginRight: 8,
     },
     time: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '600',
         color: '#c8778a',
     },
@@ -75,23 +95,57 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     clientName: {
-        fontSize: 16,
+        fontSize: 13,
         fontWeight: '600',
         color: '#333',
-        marginBottom: 2,
+    },
+    clientNamePlaceholder: {
+        color: '#999',
+        fontStyle: 'italic',
     },
     title: {
-        fontSize: 14,
+        fontSize: 11,
         color: '#666',
-        marginBottom: 2,
     },
     notes: {
-        fontSize: 12,
+        fontSize: 10,
         color: '#999',
         fontStyle: 'italic',
     },
     deleteButton: {
-        padding: 6,
-        marginLeft: 8,
+        padding: 4,
+        marginLeft: 4,
+    },
+    compactContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        marginHorizontal: 2,
+        marginVertical: 1,
+        borderLeftWidth: 3,
+        borderLeftColor: '#c8778a',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    compactClientName: {
+        fontSize: 11,
+        fontWeight: '600',
+        color: '#333',
+        marginBottom: 1,
+    },
+    compactTitle: {
+        fontSize: 10,
+        color: '#666',
+        lineHeight: 13,
+    },
+    compactTime: {
+        fontSize: 9,
+        fontWeight: '600',
+        color: '#c8778a',
+        marginTop: 3,
     },
 });

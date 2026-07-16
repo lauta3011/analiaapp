@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { DateNavigation } from '@/components/agenda/common/DateNavigation';
 import { DayColumn } from './DayColumn';
 import { COLORS, CALENDAR_LOCALE } from '@/constants';
@@ -74,7 +74,7 @@ export const WeeklyView = ({
                 onNext={onNextWeek}
                 onToday={onToday}
             />
-            <View style={styles.columns}>
+            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.columns}>
                 {weekDates.map((date, index) => {
                     const dateStr = toDateStr(date);
                     return (
@@ -89,7 +89,7 @@ export const WeeklyView = ({
                         />
                     );
                 })}
-            </View>
+            </ScrollView>
         </View>
     );
 };
@@ -100,7 +100,5 @@ const styles = StyleSheet.create({
     },
     columns: {
         flex: 1,
-        flexDirection: 'row',
-        paddingHorizontal: 4,
     },
 });
