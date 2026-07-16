@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {ColorValue, StyleSheet, View} from 'react-native';
 import { Button } from 'react-native-paper';
 import Svg, {Path} from 'react-native-svg';
+import { COLORS } from '@/constants';
 
 const Canvas = (props: any) => {
   const [paths, setPaths] = useState<any>([]);
@@ -56,8 +57,8 @@ const Canvas = (props: any) => {
         </Svg>
       </View>
       <View style={styles.buttons}>
-        <Button onPress={() => props.handleHide()} mode='text'>cancelar</Button>
-        <Button onPress={() => formatPaths(paths)} mode='contained'>confirmar</Button>
+        <Button onPress={() => props.handleHide()} mode='outlined' style={styles.cancelButton}>Cancelar</Button>
+        <Button onPress={() => formatPaths(paths)} mode='contained' style={styles.confirmButton}>Confirmar</Button>
       </View>
     </>
   );
@@ -70,15 +71,24 @@ const styles = StyleSheet.create({
     height: 400,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: COLORS.primaryLight,
     margin: 10
   },
-  buttons : {
-    display: 'flex',
+  buttons: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '60%'
-  }
+    justifyContent: 'space-between',
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  cancelButton: {
+    flex: 1,
+    marginRight: 8,
+  },
+  confirmButton: {
+    flex: 1,
+    marginLeft: 8,
+    backgroundColor: COLORS.primary,
+  },
 });
 
 export default Canvas;

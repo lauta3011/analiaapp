@@ -5,7 +5,7 @@ import { create } from 'zustand';
  
 interface FormStore {
     loading: boolean,
-    confirmUser: (form: object) => void,
+    confirmUser: (form: object) => Promise<boolean>,
     updateUser: (form: object) => Promise<boolean>
 }
 
@@ -23,12 +23,14 @@ export const useFormStore = create<FormStore>((set) => ({
                     text2: 'La operación se completó con éxito',
                 });
             })
+            return true;
         } catch (error: any) {
             Toast.show({
             type: 'error',
             text1: 'Error',
             text2: 'No fue posible agregar el usuario',
             });
+            return false;
         } finally {
             set({ loading: false });
         }
@@ -39,7 +41,6 @@ export const useFormStore = create<FormStore>((set) => ({
         try {
             await updateUser({ id, full_name, notes, phone, picture_path }).then(() => {
                 Toast.show({
-                    type: 'success',
                     text1: 'Usuario agregado',
                     text2: 'La operación se completó con éxito',
                 });
@@ -47,9 +48,9 @@ export const useFormStore = create<FormStore>((set) => ({
             return true;
         } catch (error) {
             Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'No fue posible agregar el usuario',
+            type: 'error',
+            text1: 'Error',
+            text2: 'No fue posible agregar el usuario',
             });
             return false;
         } finally {

@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import CheckButton from "../atoms/CheckButton";
 import { Button, Text } from "react-native-paper";
+import { COLORS } from "@/constants";
 
 export const TagsList = (props: any) => {
     const { list, title, subText, handleModal, handleAction, type, label } = props;
@@ -26,27 +27,22 @@ export const TagsList = (props: any) => {
 }
 
 const styles = StyleSheet.create({
-    textContainer: {
-        marginTop: 12
-    },
     subText: {
         fontStyle: "italic",
-        color: 'grey',
-        padding: 5
+        color: COLORS.textMuted,
+        padding: 5,
     },
     subHeading: {
-        fontSize: 26,
-        fontWeight: '400',
-        marginVertical: 5
-      },
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.text,
+        marginTop: 12,
+        marginBottom: 4,
+    },
     listContainer: {
         display:'flex',
         flexDirection: 'row', 
         flexWrap: 'wrap',
         justifyContent: 'center'
     },
-        buttonContainer: {
-        flexGrow: 3,
-        margin: 5,
-    } 
 })

@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import { IconButton } from "react-native-paper";
+import { COLORS } from "@/constants";
 
 export default function AddClientButton(props: any) {
     return (
@@ -17,13 +18,13 @@ export default function AddClientButton(props: any) {
 const styles = StyleSheet.create({
     floatingButton: {
         zIndex: 10,
-        position: 'absolute', // Posicionamiento absoluto para el botón flotante
-        bottom: 20, // Espacio desde la parte inferior de la pantalla
-        right: 20, // Espacio desde la parte derecha de la pantalla
-        width: 60, // Ancho del botón
-        height: 60, // Alto del botón
-        borderRadius: 30, // Redondear el botón para hacerlo circular
-        backgroundColor: '#c8778a',
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: COLORS.primary,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 10, 

@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { COLORS } from '@/constants';
 import { Appointment } from '@/types';
 import { AppointmentCard } from '@/components/atoms/AppointmentCard';
+import { useModalStore } from '@/store/modal';
 
 interface DayColumnProps {
     dayName: string;
@@ -21,6 +22,8 @@ export const DayColumn = ({
     appointments,
     onDeleteAppointment,
 }: DayColumnProps) => {
+    const openModal = useModalStore((s) => s.openModal);
+
     return (
         <View style={[styles.container, isToday && styles.todayContainer]}>
             <View style={[styles.header, isToday && styles.todayHeader]}>
@@ -35,6 +38,8 @@ export const DayColumn = ({
                             <AppointmentCard
                                 appointment={apt}
                                 onDelete={onDeleteAppointment}
+                                onPress={() => openModal('appointment-detail', { appointment: apt })}
+                                compact
                             />
                         </View>
                     ))
@@ -50,12 +55,12 @@ export const DayColumn = ({
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        width: 140,
         borderRightWidth: 1,
         borderRightColor: COLORS.primaryLight,
     },
     todayContainer: {
-        backgroundColor: COLORS.primaryLight + '30',
+        backgroundColor: COLORS.primaryLight + '20',
     },
     header: {
         alignItems: 'center',
@@ -64,7 +69,12 @@ const styles = StyleSheet.create({
         borderBottomColor: COLORS.primaryLight,
     },
     todayHeader: {
-        backgroundColor: COLORS.primary,
+        borderWidth: 2,
+        borderColor: COLORS.error,
+        borderStyle: 'dotted',
+        borderRadius: 6,
+        marginHorizontal: 2,
+        marginTop: 2,
     },
     dayName: {
         fontSize: 11,
@@ -78,15 +88,16 @@ const styles = StyleSheet.create({
         color: COLORS.text,
     },
     todayText: {
-        color: '#fff',
+        color: COLORS.error,
+        fontWeight: '700',
     },
     scroll: {
         flex: 1,
-        paddingVertical: 4,
+        paddingVertical: 2,
     },
     cardWrapper: {
         paddingHorizontal: 2,
-        marginBottom: 4,
+        marginBottom: 2,
     },
     emptyContainer: {
         flex: 1,

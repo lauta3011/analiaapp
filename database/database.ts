@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabaseAsync("db-v5.db");
+const db = SQLite.openDatabaseAsync("db.db");
 
 const initializeDB = async () => {
     try {
@@ -67,12 +67,11 @@ const initializeDB = async () => {
         await database.execAsync(`
             CREATE TABLE IF NOT EXISTS APPOINTMENT (
                 id INTEGER PRIMARY KEY NOT NULL,
-                id_user INTEGER NOT NULL,
+                id_user INTEGER,
                 date TEXT NOT NULL,
                 time TEXT,
                 title TEXT NOT NULL,
                 notes TEXT,
-                status TEXT DEFAULT 'pending',
                 dateCreated TEXT DEFAULT (datetime('now')),
                 FOREIGN KEY (id_user) REFERENCES USER(id) ON DELETE CASCADE
             )
@@ -83,9 +82,10 @@ const initializeDB = async () => {
     }
 };
 
-initializeDB();
+export const initialized = initializeDB();
 
 export const fetchUserByLetter = async (letter: string) => {
+    await initialized;
     const database = await db;
     try {
         if (letter.length !== 1 || !letter.match(/[a-z]/i)) {
@@ -109,7 +109,30 @@ export const fetchUserByLetter = async (letter: string) => {
       }
 }
 
+export const fetchUsersBySearch = async (query: string) => {
+    await initialized;
+    const database = await db;
+    try {
+        const statement = await database.prepareAsync(
+          'SELECT * FROM USER WHERE full_name LIKE $pattern OR phone LIKE $pattern2 ORDER BY full_name ASC LIMIT 10'
+        );
+        
+        const result = await statement.executeAsync({
+          $pattern: `%${query}%`,
+          $pattern2: `%${query}%`,
+        });
+        
+        const users = await result.getAllAsync();
+        await statement.finalizeAsync();
+        return users;
+      } catch (error) {
+        console.error('Error al buscar usuarios:', error);
+        throw error;
+      }
+}
+
 export const fetchUserAllergies = async (id: number) => {
+    await initialized;
     const database = await db;
     try {
         const userAllergies = await database.getAllAsync(`SELECT a.name AS allergy_name
@@ -124,6 +147,7 @@ export const fetchUserAllergies = async (id: number) => {
 };
 
 export const fetchUserCharacteristics = async (id: number) => {
+    await initialized;
     const database = await db;
     try {
         const userAllergies = await database.getAllAsync(`SELECT c.name AS characteristic_name
@@ -138,36 +162,42 @@ export const fetchUserCharacteristics = async (id: number) => {
 };
 
 export const fetchSingleUser = async (id: number) => {
+    await initialized;
     const database = await db;
     const user = await database.getAllAsync(`SELECT * FROM USER WHERE id = ${id}`);
     return user[0];
 };
 
 export const fetchSingleAllergy = async (id: number) => {
+    await initialized;
     const database = await db;
     const allergy = await database.getAllAsync(`SELECT * FROM ALLERGY WHERE id = ${id}`);
     return allergy;
 };
 
 export const fetchSingleCharacteristic = async (id: number) => {
+    await initialized;
     const database = await db;
     const characteristic = await database.getAllAsync(`SELECT * FROM CHARACTERISTIC WHERE id = ${id}`);
     return characteristic;
 };
 
 export const fetchAllergies = async () => {
+    await initialized;
     const database = await db;
     const allergies = await database.getAllAsync('SELECT * FROM ALLERGY');
     return allergies;
 };
 
 export const fetchCharacteristics = async () => {
+    await initialized;
     const database = await db;
     const characteristics = await database.getAllAsync('SELECT * FROM CHARACTERISTIC');
     return characteristics;
 };
 
 export const fetchDrawing = async (user: number) => {
+    await initialized;
     const database = await db;
     try {
       const drawing = await database.getAllAsync(
@@ -180,6 +210,7 @@ export const fetchDrawing = async (user: number) => {
   };
 
 export const updateUser = async (user: any) => {
+    await initialized;
     const { id, full_name, notes, phone, picture_path } = user;
     const database = await db;
     
@@ -210,6 +241,7 @@ export const updateUser = async (user: any) => {
 }
 
 export const postUser = async (user: any) => {
+    await initialized;
     const { fullName: full_name, phone, picture: picture_path, notes } = user;
     const database = await db;
 
@@ -229,6 +261,7 @@ export const postUser = async (user: any) => {
 };
 
 export const addDrawing = async (drawingInfo: any) => {
+    await initialized;
     const { userId: id_user , selected: type, drawing: data, notes } = drawingInfo;
     const database = await db;
 
@@ -248,6 +281,7 @@ export const addDrawing = async (drawingInfo: any) => {
 };
 
 export const associateAllergies = async (user: number, allergies: object[]) => {
+    await initialized;
     const database = await db;
 
     try {
@@ -272,7 +306,8 @@ export const associateAllergies = async (user: number, allergies: object[]) => {
 }
 
 export const associateCharacteristics = async (user: number, allergies: object[]) => {
-  const database = await db;
+    await initialized;
+    const database = await db;
 
   try {
     await database.execAsync('BEGIN TRANSACTION');
@@ -303,6 +338,7 @@ export const associateCharacteristics = async (user: number, allergies: object[]
 };
 
 export const postAllergy = async (name: any) => {
+    await initialized;
     const database = await db;
         let statement: SQLite.SQLiteStatement = await database.prepareAsync(
         'INSERT INTO ALLERGY (name) VALUES ($name)'
@@ -318,6 +354,7 @@ export const postAllergy = async (name: any) => {
 };
 
 export const postCharacteristic = async (name: any) => {
+    await initialized;
     const database = await db;
         let statement: SQLite.SQLiteStatement = await database.prepareAsync(
         'INSERT INTO CHARACTERISTIC (name) VALUES ($name)'
@@ -333,12 +370,13 @@ export const postCharacteristic = async (name: any) => {
 };
 
 export const fetchAppointmentsForDate = async (date: string) => {
+    await initialized;
     const database = await db;
     try {
         const appointments = await database.getAllAsync(
             `SELECT a.*, u.full_name 
              FROM APPOINTMENT a 
-             JOIN USER u ON a.id_user = u.id 
+             LEFT JOIN USER u ON a.id_user = u.id 
              WHERE a.date = $date 
              ORDER BY a.time ASC`,
             { $date: date }
@@ -351,6 +389,7 @@ export const fetchAppointmentsForDate = async (date: string) => {
 };
 
 export const fetchAppointmentsForMonth = async (year: number, month: number) => {
+    await initialized;
     const database = await db;
     try {
         const monthStr = month.toString().padStart(2, '0');
@@ -359,7 +398,7 @@ export const fetchAppointmentsForMonth = async (year: number, month: number) => 
         const appointments = await database.getAllAsync(
             `SELECT a.*, u.full_name 
              FROM APPOINTMENT a 
-             JOIN USER u ON a.id_user = u.id 
+             LEFT JOIN USER u ON a.id_user = u.id 
              WHERE a.date >= $startDate AND a.date <= $endDate
              ORDER BY a.date ASC, a.time ASC`,
             { $startDate: startDate, $endDate: endDate }
@@ -372,12 +411,13 @@ export const fetchAppointmentsForMonth = async (year: number, month: number) => 
 };
 
 export const fetchAllAppointments = async () => {
+    await initialized;
     const database = await db;
     try {
         const appointments = await database.getAllAsync(
             `SELECT a.*, u.full_name 
              FROM APPOINTMENT a 
-             JOIN USER u ON a.id_user = u.id 
+             LEFT JOIN USER u ON a.id_user = u.id 
              ORDER BY a.date ASC, a.time ASC`
         );
         return appointments;
@@ -388,6 +428,7 @@ export const fetchAllAppointments = async () => {
 };
 
 export const postAppointment = async (appointment: any) => {
+    await initialized;
     const { id_user, date, time, title, notes } = appointment;
     const database = await db;
 
@@ -397,7 +438,7 @@ export const postAppointment = async (appointment: any) => {
 
     try {
         const result = await statement.executeAsync({
-            $id_user: id_user,
+            $id_user: id_user || null,
             $date: date,
             $time: time || null,
             $title: title,
@@ -413,6 +454,7 @@ export const postAppointment = async (appointment: any) => {
 };
 
 export const deleteAppointment = async (id: number) => {
+    await initialized;
     const database = await db;
     const statement: SQLite.SQLiteStatement = await database.prepareAsync(
         'DELETE FROM APPOINTMENT WHERE id = $id'

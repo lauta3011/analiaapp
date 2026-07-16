@@ -2,11 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet } from 'react-native';
 import { useAppointmentStore } from '@/store/appointments';
 import FloatingButton from '@/components/atoms/FloatingButton';
-import Toast from 'react-native-toast-message';
-import ToastConfig from '@/components/atoms/ToastConfig';
-import { ModalForm } from '@/components/forms/ModalForm';
-import { AppointmentForm } from '@/components/forms/AppointmentForm';
 import { COLORS, VIEW_MODES } from '@/constants';
+import { useModalStore } from '@/store/modal';
 
 type ViewMode = typeof VIEW_MODES[keyof typeof VIEW_MODES];
 import { ViewSwitcher } from '@/components/agenda/common/ViewSwitcher';
@@ -21,6 +18,27 @@ const toDateStr = (d: Date): string => {
     return `${year}-${month}-${day}`;
 };
 
+const offsetDate = (dateStr: string, days: number): string => {
+    const d = new Date(dateStr + 'T12:00:00');
+    d.setDate(d.getDate() + days);
+    return toDateStr(d);
+};
+
+const offsetMonth = (dateStr: string, months: number): string => {
+    const d = new Date(dateStr + 'T12:00:00');
+    d.setMonth(d.getMonth() + months);
+    return toDateStr(d);
+};
+
+const getWeekStart = (dateStr: string): Date => {
+    const d = new Date(dateStr + 'T12:00:00');
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    d.setDate(diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+};
+
 export default function AgendaScreen() {
     const items = useAppointmentStore((s) => s.items);
     const selected = useAppointmentStore((s) => s.selected);
@@ -29,18 +47,11 @@ export default function AgendaScreen() {
     const deleteAppointment = useAppointmentStore((s) => s.deleteAppointment);
     const setSelected = useAppointmentStore((s) => s.setSelected);
 
-    const [modalVisible, setModalVisible] = useState(false);
-    const [activeView, setActiveView] = useState<ViewMode>(VIEW_MODES.DAILY);
-    const [currentDate, setCurrentDate] = useState(() => new Date());
+    const openModal = useModalStore((s) => s.openModal);
 
-    const getWeekStart = (date: Date): Date => {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-        d.setDate(diff);
-        d.setHours(0, 0, 0, 0);
-        return d;
-    };
+    const [activeView, setActiveView] = useState<ViewMode>(VIEW_MODES.DAILY);
+
+    const currentDate = useMemo(() => new Date(selected + 'T12:00:00'), [selected]);
 
     const initialLoadDone = useRef(false);
 
@@ -53,14 +64,10 @@ export default function AgendaScreen() {
     }, []);
 
     useEffect(() => {
-        const now = new Date();
-        const currentMonth = now.getMonth() + 1;
-        const currentYear = now.getFullYear();
-
-        if (activeView === VIEW_MODES.MONTHLY) {
+        if (activeView === VIEW_MODES.MONTHLY || activeView === VIEW_MODES.DAILY) {
             loadItemsForMonth(currentDate.getFullYear(), currentDate.getMonth() + 1);
         } else if (activeView === VIEW_MODES.WEEKLY) {
-            const weekStart = getWeekStart(currentDate);
+            const weekStart = getWeekStart(selected);
             const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekEnd.getDate() + 6);
             loadItemsForDateRange(toDateStr(weekStart), toDateStr(weekEnd));
@@ -68,74 +75,48 @@ export default function AgendaScreen() {
     }, [activeView, currentDate]);
 
     const handleDayPress = useCallback((date: string) => {
-        setSelected(date);
-        setCurrentDate(new Date(date + 'T12:00:00'));
-        setActiveView(VIEW_MODES.DAILY);
-    }, []);
+        if (date === selected) {
+            setActiveView(VIEW_MODES.DAILY);
+        } else {
+            setSelected(date);
+        }
+    }, [selected]);
 
     const handleDelete = useCallback(async (id: number, date: string) => {
         deleteAppointment(id, date);
     }, []);
 
     const handleAddAtHour = useCallback((hour: number) => {
-        const time = `${hour.toString().padStart(2, '0')}:00`;
-        setModalVisible(true);
-    }, []);
+        openModal('appointment-form', { selectedDate: selected, initialHour: hour });
+    }, [selected]);
 
     const goToToday = useCallback(() => {
-        setCurrentDate(new Date());
         setSelected(toDateStr(new Date()));
     }, []);
 
     const goToPrevMonth = useCallback(() => {
-        setCurrentDate((prev) => {
-            const d = new Date(prev);
-            d.setMonth(d.getMonth() - 1);
-            return d;
-        });
-    }, []);
+        setSelected(offsetMonth(selected, -1));
+    }, [selected]);
 
     const goToNextMonth = useCallback(() => {
-        setCurrentDate((prev) => {
-            const d = new Date(prev);
-            d.setMonth(d.getMonth() + 1);
-            return d;
-        });
-    }, []);
+        setSelected(offsetMonth(selected, 1));
+    }, [selected]);
 
     const goToPrevDay = useCallback(() => {
-        setCurrentDate((prev) => {
-            const d = new Date(prev);
-            d.setDate(d.getDate() - 1);
-            setSelected(toDateStr(d));
-            return d;
-        });
-    }, []);
+        setSelected(offsetDate(selected, -1));
+    }, [selected]);
 
     const goToNextDay = useCallback(() => {
-        setCurrentDate((prev) => {
-            const d = new Date(prev);
-            d.setDate(d.getDate() + 1);
-            setSelected(toDateStr(d));
-            return d;
-        });
-    }, []);
+        setSelected(offsetDate(selected, 1));
+    }, [selected]);
 
     const goToPrevWeek = useCallback(() => {
-        setCurrentDate((prev) => {
-            const d = new Date(prev);
-            d.setDate(d.getDate() - 7);
-            return d;
-        });
-    }, []);
+        setSelected(offsetDate(selected, -7));
+    }, [selected]);
 
     const goToNextWeek = useCallback(() => {
-        setCurrentDate((prev) => {
-            const d = new Date(prev);
-            d.setDate(d.getDate() + 7);
-            return d;
-        });
-    }, []);
+        setSelected(offsetDate(selected, 7));
+    }, [selected]);
 
     return (
         <View style={styles.container}>
@@ -181,19 +162,8 @@ export default function AgendaScreen() {
             </View>
 
             <View style={styles.fabContainer}>
-                <FloatingButton handleAction={() => setModalVisible(true)} />
+                <FloatingButton handleAction={() => openModal('appointment-form', { selectedDate: selected, initialHour: null })} />
             </View>
-
-            {modalVisible && (
-                <ModalForm handleHide={() => setModalVisible(false)}>
-                    <AppointmentForm
-                        handleHide={() => setModalVisible(false)}
-                        selectedDate={selected}
-                    />
-                </ModalForm>
-            )}
-
-            <Toast config={ToastConfig} visibilityTime={4000} />
         </View>
     );
 }
