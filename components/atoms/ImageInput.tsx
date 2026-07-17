@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { COLORS } from '@/constants';
 
 const ImageInput = (props: any) => {
   const [profileImage, setProfileImage] = useState(props.prevImage);
@@ -37,7 +38,7 @@ const ImageInput = (props: any) => {
         {profileImage ? (
           <Image source={{ uri: profileImage }} style={styles.image} />
         ) : (
-          <MaterialCommunityIcons name="account" size={60} color="#6e6e6e" />
+          <MaterialCommunityIcons name="account" size={60} color={COLORS.textMuted} />
         )}
       </TouchableOpacity>
     </View>
@@ -55,12 +56,12 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: COLORS.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: COLORS.primaryLight,
   },
   image: {
     width: '100%',

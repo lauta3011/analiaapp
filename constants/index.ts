@@ -47,10 +47,10 @@ export const COLORS = {
     primaryDark: '#e8b6c2',
     error: '#c73e3e',
     success: '#3cba9f',
-    text: '#333',
+    text: '#8a5060',
     textSecondary: '#666',
-    textMuted: '#999',
-    background: '#fff',
+    textMuted: '#888',
+    background: '#fdf0f3',
 }
 
 export const PINK_GRADIENT = [
@@ -69,4 +69,9 @@ export const VIEW_MODES = {
     DAILY: 'daily',
     WEEKLY: 'weekly',
     MONTHLY: 'monthly',
+} as const;
+
+export const DRESS_SWITCH_MODES = {
+    ALL: 'all',
+    RENTED: 'rented',
 } as const;

@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         paddingTop: 12,
     },
     time: {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: '500',
         color: COLORS.textMuted,
     },

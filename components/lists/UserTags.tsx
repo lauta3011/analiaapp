@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   text: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '300'
   },
 });

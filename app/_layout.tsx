@@ -13,6 +13,7 @@ const RootLayout = () => {
 
     const isIndex = pathname === '/';
     const isNames = pathname.startsWith('/names');
+    const isDress = pathname.startsWith('/dress');
 
     return (
         <View style={styles.root}>
@@ -41,6 +42,20 @@ const RootLayout = () => {
                             iconColor={isNames ? '#fff' : COLORS.primaryLight}
                             size={28}
                             onPress={() => router.push('/names')}
+                        />
+                    </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.navButton, isDress && styles.navButtonActive]}
+                    onPress={() => router.push('/dress')}
+                >
+                    <View style={styles.iconWrapper}>
+                        <IconButton
+                            icon="hanger"
+                            iconColor={isDress ? '#fff' : COLORS.primaryLight}
+                            size={28}
+                            onPress={() => router.push('/dress')}
                         />
                     </View>
                 </TouchableOpacity>

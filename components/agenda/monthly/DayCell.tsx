@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         margin: 1,
     },
     dayNumber: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '500',
         color: COLORS.text,
     },
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 3,
     },
     badgeText: {
-        fontSize: 9,
+        fontSize: 11,
         fontWeight: '700',
         color: '#fff',
     },

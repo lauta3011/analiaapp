@@ -8,28 +8,28 @@ import { Button } from 'react-native-paper';
 import Canvas from '../molecules/Canvas';
 import { EYELASHES_MAP } from '@/constants/eyelashes';
 import { addDrawing } from '@/database/database';
-import TextBox from '../atoms/TextBox';
 import { COLORS } from '@/constants';
+import Toast from 'react-native-toast-message';
 
 type ImageKey = keyof typeof EYELASHES_MAP;
 
 export const EyelashDraw = (props: any) => {
-  const { userId } = props;
+  const { userId, appointmentId } = props;
   const [selected, setSelected] = useState<ImageKey>(props.selectedImage);
-  const [notes, setNotes] = useState('');
 
   const confirmDrawing = async (drawing: string) => {
-    await addDrawing({userId, selected, drawing, notes}).then(() => {
+    await addDrawing({userId, selected, drawing, appointmentId}).then(() => {
+      Toast.show({
+        type: 'success',
+        text1: 'Dibujo guardado',
+        text2: 'La sesion de pestanas se guardo correctamente',
+      });
       props.confirmForm()
     });
   }
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.notesContainer}>
-        <TextBox number={false} label='notas' setValue={(value:string) => setNotes(value)} value={notes} />
-      </View>
-
       <View style={styles.buttonRow}>
         <Button mode={selected === 1 ? 'contained' : 'outlined'} onPress={() => setSelected(1)} style={selected === 1 ? styles.selectedButton : undefined}>Natural</Button>
         <Button mode={selected === 2 ? 'contained' : 'outlined'} onPress={() => setSelected(2)} style={selected === 2 ? styles.selectedButton : undefined}>Abierta</Button>
@@ -51,17 +51,14 @@ const styles = StyleSheet.create({
   wrapper: {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
-  },
-  notesContainer: {
-    height: 60,
-    width: '100%',
-    marginBottom: 15,
+    alignItems: 'center',
+    flex: 1,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 10,
+    marginBottom: 16,
   },
   selectedButton: {
     backgroundColor: COLORS.primary,
@@ -69,6 +66,6 @@ const styles = StyleSheet.create({
   image: {
     position: 'absolute',
     alignSelf: 'center',
-    height: '100%'
+    height: '100%',
   }
 });

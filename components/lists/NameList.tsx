@@ -48,6 +48,6 @@ export default function NameList(props: any) {
       borderBottomColor: '#ccc',
     },
     name: {
-      fontSize: 18,
+      fontSize: 19,
     },
   });

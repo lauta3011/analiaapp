@@ -7,6 +7,9 @@ import { EyelashDraw } from '@/components/forms/EyelashDraw';
 import { TagForm } from '@/components/forms/TagForm';
 import { NewClientForm } from '@/components/forms/NewClientForm';
 import { AppointmentDetail } from '@/components/forms/AppointmentDetail';
+import { DressForm } from '@/components/forms/DressForm';
+import { RentalForm } from '@/components/forms/RentalForm';
+import { RentalDetail } from '@/components/forms/RentalDetail';
 import { COLORS } from '@/constants';
 import Toast from 'react-native-toast-message';
 import ToastConfig from '@/components/atoms/ToastConfig';
@@ -17,6 +20,9 @@ const MODAL_TITLES: Record<string, string> = {
     'eyelash-session': 'Actualizar sesion',
     'tag-form': 'Agregar',
     'add-client': 'Nuevo cliente',
+    'dress-form': 'Nuevo vestido',
+    'rental-form': 'Registrar alquiler',
+    'rental-detail': 'Detalle de alquiler',
 };
 
 export const AppModal = () => {
@@ -56,6 +62,12 @@ export const AppModal = () => {
                 );
             case 'add-client':
                 return <NewClientForm handleHide={closeModal} />;
+            case 'dress-form':
+                return <DressForm handleHide={closeModal} />;
+            case 'rental-form':
+                return <RentalForm handleHide={closeModal} dress={modalProps.dress} />;
+            case 'rental-detail':
+                return <RentalDetail handleHide={closeModal} rental={modalProps.rental} />;
             default:
                 return null;
         }

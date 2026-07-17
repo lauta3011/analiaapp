@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Appointment } from '@/types';
+import { COLORS } from '@/constants';
 
 interface AppointmentCardProps {
     appointment: Appointment;
@@ -19,15 +20,19 @@ export const AppointmentCard = ({ appointment, onDelete, onPress, compact }: App
     if (compact) {
         return (
             <TouchableOpacity style={styles.compactContainer} onPress={onPress} activeOpacity={0.7}>
-                <Text style={[styles.compactClientName, !appointment.full_name && styles.clientNamePlaceholder]} numberOfLines={1}>
-                    {appointment.full_name || 'Sin cliente'}
-                </Text>
-                <Text style={styles.compactTitle} numberOfLines={2}>
-                    {appointment.title}
-                </Text>
-                <Text style={styles.compactTime}>
-                    {appointment.time ? formatTime(appointment.time) : ''}
-                </Text>
+                <View style={styles.compactTopRow}>
+                    <Text style={styles.compactTitle} numberOfLines={1}>
+                        {appointment.title}
+                    </Text>
+                </View>
+                <View style={styles.compactBottomRow}>
+                    {appointment.date && (
+                        <Text style={styles.compactDate} numberOfLines={1}>{appointment.date}</Text>
+                    )}
+                    {appointment.time && (
+                        <Text style={styles.compactTime} numberOfLines={1}>{formatTime(appointment.time)}</Text>
+                    )}
+                </View>
             </TouchableOpacity>
         );
     }
@@ -56,7 +61,7 @@ export const AppointmentCard = ({ appointment, onDelete, onPress, compact }: App
                 style={styles.deleteButton}
                 onPress={() => onDelete(appointment.id, appointment.date)}
             >
-                <MaterialCommunityIcons name="trash-can-outline" size={20} color="#c73e3e" />
+                <MaterialCommunityIcons name="trash-can-outline" size={20} color={COLORS.error} />
             </TouchableOpacity>
         </TouchableOpacity>
     );
@@ -78,38 +83,38 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     timeContainer: {
-        width: 42,
+        width: 48,
         alignItems: 'center',
         justifyContent: 'center',
         borderRightWidth: 1,
-        borderRightColor: '#e8b6c2',
+        borderRightColor: COLORS.primaryDark,
         paddingRight: 8,
         marginRight: 8,
     },
     time: {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: '600',
-        color: '#c8778a',
+        color: COLORS.primary,
     },
     content: {
         flex: 1,
     },
     clientName: {
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: '600',
-        color: '#333',
+        color: COLORS.text,
     },
     clientNamePlaceholder: {
-        color: '#999',
+        color: COLORS.textMuted,
         fontStyle: 'italic',
     },
     title: {
-        fontSize: 11,
-        color: '#666',
+        fontSize: 13,
+        color: COLORS.textSecondary,
     },
     notes: {
-        fontSize: 10,
-        color: '#999',
+        fontSize: 12,
+        color: COLORS.textMuted,
         fontStyle: 'italic',
     },
     deleteButton: {
@@ -119,33 +124,41 @@ const styles = StyleSheet.create({
     compactContainer: {
         backgroundColor: '#fff',
         borderRadius: 8,
-        paddingVertical: 6,
-        paddingHorizontal: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 10,
         marginHorizontal: 2,
-        marginVertical: 1,
+        marginVertical: 4,
         borderLeftWidth: 3,
-        borderLeftColor: '#c8778a',
+        borderLeftColor: COLORS.primary,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.08,
         shadowRadius: 2,
         elevation: 1,
     },
-    compactClientName: {
-        fontSize: 11,
-        fontWeight: '600',
-        color: '#333',
-        marginBottom: 1,
+    compactTopRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
     },
     compactTitle: {
-        fontSize: 10,
-        color: '#666',
-        lineHeight: 13,
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.text,
+        flex: 1,
+    },
+    compactBottomRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    compactDate: {
+        fontSize: 12,
+        color: COLORS.textSecondary,
     },
     compactTime: {
-        fontSize: 9,
+        fontSize: 12,
         fontWeight: '600',
-        color: '#c8778a',
-        marginTop: 3,
+        color: COLORS.primary,
     },
 });

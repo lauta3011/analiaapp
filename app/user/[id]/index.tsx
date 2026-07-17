@@ -1,42 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
-import { ScrollView } from 'react-native';
-import { fetchDrawing, fetchSingleUser, fetchUserAllergies, fetchUserCharacteristics } from '@/database/database';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
+import { fetchAppointmentsByUser, fetchSingleUser, fetchUserAllergies, fetchUserCharacteristics, deleteAppointment } from '@/database/database';
 import UserInfo from '@/components/molecules/UserInfo';
 import UserTags from '@/components/lists/UserTags';
-import { EyelashDisplay } from '@/components/lists/EyelashDisplay';
+import { AppointmentCard } from '@/components/atoms/AppointmentCard';
 import { useFormStore } from '@/store/form';
-import { useModalStore } from '@/store/modal';
+import { COLORS } from '@/constants';
+import { Appointment } from '@/types';
 
 export default function UserDetails() {
-  const { id } = useLocalSearchParams();
+  const { id, appointmentId } = useLocalSearchParams<{ id: string; appointmentId?: string }>();
+  const router = useRouter();
   const { updateUser } = useFormStore();
   const [user, setUser] = useState<any>({});
   const [allergies, setAllergies] = useState<any>([]);
   const [characteristics, setCharacteristics] = useState<any>([]);
-  const [drawing, setDrawing] = useState<any>();
-  const [notes, setNotes] = useState<any>();
-  const [selectedImage, setSelectedImage] = useState(1);
-
-  const openModal = useModalStore((s) => s.openModal);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const userID = parseInt(id as string);
+  const existingAppointmentId = appointmentId ? parseInt(appointmentId) : null;
 
-  const getLatestDrawing = async () => {
-    const eyelashDrawing: any = await fetchDrawing(userID);
-
-    if (eyelashDrawing != null) {
-        const drawing = JSON.parse(eyelashDrawing.data);
-        setSelectedImage(eyelashDrawing.type)
-        setNotes(eyelashDrawing.notes)
-        setDrawing(drawing);
-    }
-  }
-
-  const getUserData = async () => {  
+  const getUserData = async () => {
     let allergies: any = [];
     let characteristics: any = [];
-    
+
     const user = await fetchSingleUser(userID);
     const userAllergies = await fetchUserAllergies(userID);
     const userCharacteristics = await fetchUserCharacteristics(userID);
@@ -49,11 +37,14 @@ export default function UserDetails() {
       characteristics.push(item?.characteristic_name);
     })
 
-    getLatestDrawing();
-
     setUser(user);
     setAllergies(allergies);
     setCharacteristics(characteristics);
+  }
+
+  const getAppointments = async () => {
+    const data = await fetchAppointmentsByUser(userID);
+    setAppointments(data as Appointment[]);
   }
 
   const updateUserData = async (form: any) => {
@@ -64,18 +55,128 @@ export default function UserDetails() {
     }
   }
 
-  useEffect(() => {
-    getUserData();
+  const handleDeleteAppointment = useCallback(async (appointmentId: number, date: string) => {
+    Alert.alert(
+      'Eliminar cita',
+      '¿Estás seguro de que quieres eliminar esta cita?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteAppointment(appointmentId);
+            getAppointments();
+          }
+        },
+      ]
+    );
   }, []);
 
-  return (
-    <ScrollView  style={{ paddingHorizontal: 25, backgroundColor: '#fff' }} >
-      <UserInfo user={user} handleUpdate={(form: any) => updateUserData(form)}/>
-      
-      {characteristics?.length > 0 && <UserTags items={characteristics} title="Caracteristicas"/>}
-      {allergies?.length > 0 && <UserTags items={allergies} title="Alergias"/>}
+  const handleAppointmentPress = useCallback((appointment: Appointment) => {
+    router.push({ pathname: `/user/${id}/appointment/${appointment.id}` });
+  }, [id]);
 
-      <EyelashDisplay notes={notes} drawing={drawing} selected={selectedImage} openModal={() => openModal('eyelash-session', { selectedImage, userId: id, onConfirm: getLatestDrawing })} />
-    </ScrollView>
+  useEffect(() => {
+    getUserData();
+    getAppointments();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getAppointments();
+    }, [])
+  );
+
+  const currentAppointment = existingAppointmentId
+    ? appointments.find((a) => a.id === existingAppointmentId) ?? null
+    : null;
+
+  const previousAppointments = existingAppointmentId
+    ? appointments.filter((a) => a.id !== existingAppointmentId)
+    : appointments;
+
+  return (
+    <FlatList
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      data={previousAppointments}
+      keyExtractor={(item) => item.id.toString()}
+      ListHeaderComponent={
+        <>
+          <UserInfo user={user} handleUpdate={(form: any) => updateUserData(form)} />
+
+          {characteristics?.length > 0 && <UserTags items={characteristics} title="Caracteristicas" />}
+          {allergies?.length > 0 && <UserTags items={allergies} title="Alergias" />}
+
+          {currentAppointment && (
+            <View style={styles.currentAppointmentSection}>
+              <Text style={styles.sectionTitle}>Cita actual</Text>
+              <View style={styles.appointmentWrapper}>
+                <AppointmentCard
+                  appointment={currentAppointment}
+                  onDelete={handleDeleteAppointment}
+                  onPress={() => handleAppointmentPress(currentAppointment)}
+                  compact
+                />
+              </View>
+            </View>
+          )}
+
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Citas anteriores</Text>
+          </View>
+        </>
+      }
+      renderItem={({ item }) => (
+        <View style={styles.appointmentWrapper}>
+          <AppointmentCard
+            appointment={item}
+            onDelete={handleDeleteAppointment}
+            onPress={() => handleAppointmentPress(item)}
+            compact
+          />
+        </View>
+      )}
+      ListEmptyComponent={
+        <Text style={styles.emptyText}>No hay citas registradas para este cliente.</Text>
+      }
+    />
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  contentContainer: {
+    paddingHorizontal: 25,
+    paddingBottom: 40,
+  },
+  currentAppointmentSection: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  sectionHeader: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  appointmentWrapper: {
+    marginHorizontal: -25,
+    paddingHorizontal: 25,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: COLORS.textMuted,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 20,
+  },
+});

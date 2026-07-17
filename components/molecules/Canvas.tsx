@@ -29,6 +29,10 @@ const Canvas = (props: any) => {
     props.handleAddEyelash(drawing);
   }
 
+  const undoPath = () => {
+    setPaths((prev: any) => prev.slice(0, -1));
+  };
+
   return (
     <>
       <View
@@ -58,6 +62,7 @@ const Canvas = (props: any) => {
       </View>
       <View style={styles.buttons}>
         <Button onPress={() => props.handleHide()} mode='outlined' style={styles.cancelButton}>Cancelar</Button>
+        <Button onPress={undoPath} mode='outlined' disabled={paths.length === 0} style={styles.undoButton}>Deshacer</Button>
         <Button onPress={() => formatPaths(paths)} mode='contained' style={styles.confirmButton}>Confirmar</Button>
       </View>
     </>
@@ -66,13 +71,13 @@ const Canvas = (props: any) => {
 
 const styles = StyleSheet.create({
   canvas: {
-    flex: 1,
     width: '100%',
     height: 400,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: COLORS.primaryLight,
-    margin: 10
+    margin: 10,
+    overflow: 'hidden',
   },
   buttons: {
     flexDirection: 'row',
@@ -83,6 +88,10 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     marginRight: 8,
+  },
+  undoButton: {
+    flex: 1,
+    marginHorizontal: 4,
   },
   confirmButton: {
     flex: 1,
