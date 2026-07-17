@@ -77,13 +77,13 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     dayName: {
-        fontSize: 11,
+        fontSize: 13,
         fontWeight: '500',
         color: COLORS.textSecondary,
         textTransform: 'uppercase',
     },
     dayNumber: {
-        fontSize: 18,
+        fontSize: 19,
         fontWeight: '600',
         color: COLORS.text,
     },
@@ -106,6 +106,6 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         color: COLORS.textMuted,
-        fontSize: 12,
+        fontSize: 14,
     },
 });

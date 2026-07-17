@@ -97,6 +97,7 @@ export const WeeklyView = ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: COLORS.background,
     },
     columns: {
         flex: 1,

@@ -33,7 +33,7 @@ export const TagForm = (props: any) => {
 
 const styles = StyleSheet.create({
     title: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '600',
         color: COLORS.text,
         marginTop: 12,

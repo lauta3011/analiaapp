@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useAppointmentStore } from '@/store/appointments';
 import FloatingButton from '@/components/atoms/FloatingButton';
 import { COLORS, VIEW_MODES } from '@/constants';
@@ -120,7 +120,13 @@ export default function AgendaScreen() {
 
     return (
         <View style={styles.container}>
-            <ViewSwitcher activeView={activeView} onViewChange={setActiveView} />
+            <View style={styles.headingContainer}>
+                <Text style={styles.headingText}>Lleva registro de tus citas y organiza tu agenda.</Text>
+            </View>
+
+            <View style={styles.switcher}>                
+                <ViewSwitcher activeView={activeView} onViewChange={setActiveView} />
+            </View>
 
             <View style={styles.content}>
                 {activeView === VIEW_MODES.MONTHLY && (
@@ -171,7 +177,20 @@ export default function AgendaScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: COLORS.primary,
+    },
+    headingContainer: {
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+    },
+    switcher: {
+        backgroundColor: COLORS.background
+    },
+    headingText: {
+        fontSize: 20,
+        color: '#fff',
+        fontWeight: '200',
+        textAlign: 'justify',
     },
     content: {
         flex: 1,

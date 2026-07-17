@@ -27,11 +27,12 @@ const initializeDB = async () => {
             CREATE TABLE IF NOT EXISTS EYELASH_DRAWING (
                 id INTEGER PRIMARY KEY NOT NULL,
                 id_user INTEGER,
+                id_appointment INTEGER,
                 type INTEGER NOT NULL,
                 data TEXT NOT NULL,
-                notes TEXT,
                 dateCreated TEXT DEFAULT (datetime('now')),
-                FOREIGN KEY (id_user) REFERENCES USER(id_user) ON DELETE CASCADE           
+                FOREIGN KEY (id_user) REFERENCES USER(id_user) ON DELETE CASCADE,
+                FOREIGN KEY (id_appointment) REFERENCES APPOINTMENT(id) ON DELETE SET NULL
             )
         `);
 
@@ -76,6 +77,49 @@ const initializeDB = async () => {
                 FOREIGN KEY (id_user) REFERENCES USER(id) ON DELETE CASCADE
             )
         `)
+
+        await database.execAsync(`
+            CREATE TABLE IF NOT EXISTS DRESS (
+                id INTEGER PRIMARY KEY NOT NULL,
+                name TEXT NOT NULL,
+                image_path TEXT,
+                is_available INTEGER DEFAULT 1,
+                rental_cost REAL,
+                dateCreated TEXT DEFAULT (datetime('now'))
+            )
+        `)
+
+        await database.execAsync(`
+            CREATE TABLE IF NOT EXISTS RENTAL (
+                id INTEGER PRIMARY KEY NOT NULL,
+                id_dress INTEGER NOT NULL,
+                id_user INTEGER,
+                client_name TEXT,
+                rental_date TEXT NOT NULL,
+                return_date TEXT,
+                days INTEGER NOT NULL,
+                dateCreated TEXT DEFAULT (datetime('now')),
+                FOREIGN KEY (id_dress) REFERENCES DRESS(id) ON DELETE CASCADE,
+                FOREIGN KEY (id_user) REFERENCES USER(id) ON DELETE SET NULL
+            )
+        `)
+
+        try {
+            await database.execAsync(`
+                ALTER TABLE EYELASH_DRAWING ADD COLUMN id_appointment INTEGER
+            `);
+        } catch (e) {
+            // Column already exists, ignore
+        }
+
+        try {
+            await database.execAsync(`
+                ALTER TABLE EYELASH_DRAWING DROP COLUMN notes
+            `);
+        } catch (e) {
+            // Column doesn't exist or already dropped, ignore
+        }
+
         console.log("Base de datos inicializada correctamente");
     } catch (error) {
         console.error("Error al inicializar la base de datos:", error);
@@ -262,21 +306,80 @@ export const postUser = async (user: any) => {
 
 export const addDrawing = async (drawingInfo: any) => {
     await initialized;
-    const { userId: id_user , selected: type, drawing: data, notes } = drawingInfo;
+    const { userId: id_user , selected: type, drawing: data, appointmentId: id_appointment } = drawingInfo;
     const database = await db;
 
     let statement: SQLite.SQLiteStatement = await database.prepareAsync(
-        'INSERT INTO EYELASH_DRAWING (id_user, type, data, notes) VALUES ($id_user, $type, $data, $notes)'
+        'INSERT INTO EYELASH_DRAWING (id_user, id_appointment, type, data) VALUES ($id_user, $id_appointment, $type, $data)'
     );
 
     try {
-        const result = await statement.executeAsync({ $id_user: id_user, $type: type, $data: data, $notes: notes });
+        const result = await statement.executeAsync({ $id_user: id_user, $id_appointment: id_appointment || null, $type: type, $data: data });
         return result.lastInsertRowId;
     } catch (error: any) {
         console.log('ERROR ', error)
         throw new Error(error);
     } finally {
         await statement.finalizeAsync();
+    }
+};
+
+export const fetchAppointmentsByUser = async (userId: number) => {
+    await initialized;
+    const database = await db;
+    try {
+        const appointments = await database.getAllAsync(
+            `SELECT * FROM APPOINTMENT WHERE id_user = $id_user ORDER BY date DESC, time ASC`,
+            { $id_user: userId }
+        );
+        return appointments;
+    } catch (error) {
+        console.error('Error al buscar citas del usuario:', error);
+        throw error;
+    }
+};
+
+export const fetchAppointmentById = async (appointmentId: number) => {
+    await initialized;
+    const database = await db;
+    try {
+        const result = await database.getAllAsync(
+            `SELECT * FROM APPOINTMENT WHERE id = $id LIMIT 1`,
+            { $id: appointmentId }
+        );
+        return (result[0] as any) || null;
+    } catch (error) {
+        console.error('Error al buscar cita:', error);
+        throw error;
+    }
+};
+
+export const fetchDrawingByAppointment = async (appointmentId: number) => {
+    await initialized;
+    const database = await db;
+    try {
+        const drawing = await database.getAllAsync(
+            `SELECT * FROM EYELASH_DRAWING WHERE id_appointment = $id_appointment LIMIT 1`,
+            { $id_appointment: appointmentId }
+        );
+        return (drawing[0] as any) || null;
+    } catch (error) {
+        console.error('Error al buscar dibujo de la cita:', error);
+        throw error;
+    }
+};
+
+export const deleteDrawingByAppointment = async (appointmentId: number) => {
+    await initialized;
+    const database = await db;
+    try {
+        await database.runAsync(
+            'DELETE FROM EYELASH_DRAWING WHERE id_appointment = ?',
+            [appointmentId]
+        );
+    } catch (error) {
+        console.error('Error al eliminar dibujo:', error);
+        throw error;
     }
 };
 
@@ -467,5 +570,209 @@ export const deleteAppointment = async (id: number) => {
         throw error;
     } finally {
         await statement.finalizeAsync();
+    }
+};
+
+export const fetchAllDresses = async () => {
+    await initialized;
+    const database = await db;
+    try {
+        const dresses = await database.getAllAsync(
+            'SELECT * FROM DRESS ORDER BY dateCreated DESC'
+        );
+        return dresses;
+    } catch (error) {
+        console.error('Error al buscar vestidos:', error);
+        throw error;
+    }
+};
+
+export const fetchDressById = async (id: number) => {
+    await initialized;
+    const database = await db;
+    try {
+        const dress = await database.getAllAsync(
+            'SELECT * FROM DRESS WHERE id = $id',
+            { $id: id }
+        );
+        return dress[0] || null;
+    } catch (error) {
+        console.error('Error al buscar vestido:', error);
+        throw error;
+    }
+};
+
+export const postDress = async (dress: any) => {
+    await initialized;
+    const { name, image_path, is_available, rental_cost } = dress;
+    const database = await db;
+
+    const statement: SQLite.SQLiteStatement = await database.prepareAsync(
+        'INSERT INTO DRESS (name, image_path, is_available, rental_cost) VALUES ($name, $image_path, $is_available, $rental_cost)'
+    );
+
+    try {
+        const result = await statement.executeAsync({
+            $name: name,
+            $image_path: image_path || null,
+            $is_available: is_available ?? 1,
+            $rental_cost: rental_cost || null,
+        });
+        return result.lastInsertRowId;
+    } catch (error: any) {
+        console.error('Error al crear vestido:', error);
+        throw new Error(error);
+    } finally {
+        await statement.finalizeAsync();
+    }
+};
+
+export const updateDress = async (dress: any) => {
+    await initialized;
+    const { id, name, image_path, is_available, rental_cost } = dress;
+    const database = await db;
+
+    const statement: SQLite.SQLiteStatement = await database.prepareAsync(
+        `UPDATE DRESS
+        SET name = $name,
+            image_path = $image_path,
+            is_available = $is_available,
+            rental_cost = $rental_cost
+        WHERE id = $id`
+    );
+
+    try {
+        const result = await statement.executeAsync({
+            $name: name,
+            $image_path: image_path || null,
+            $is_available: is_available,
+            $rental_cost: rental_cost || null,
+            $id: id,
+        });
+        return result;
+    } catch (error) {
+        console.error('Error al actualizar vestido:', error);
+        throw error;
+    } finally {
+        await statement.finalizeAsync();
+    }
+};
+
+export const deleteDress = async (id: number) => {
+    await initialized;
+    const database = await db;
+    const statement: SQLite.SQLiteStatement = await database.prepareAsync(
+        'DELETE FROM DRESS WHERE id = $id'
+    );
+
+    try {
+        await statement.executeAsync({ $id: id });
+    } catch (error) {
+        console.error('Error al eliminar vestido:', error);
+        throw error;
+    } finally {
+        await statement.finalizeAsync();
+    }
+};
+
+export const fetchActiveRentals = async () => {
+    await initialized;
+    const database = await db;
+    try {
+        const rentals = await database.getAllAsync(
+            `SELECT r.*, d.name AS dress_name, d.image_path AS dress_image, u.full_name
+             FROM RENTAL r
+             JOIN DRESS d ON r.id_dress = d.id
+             LEFT JOIN USER u ON r.id_user = u.id
+             WHERE r.return_date IS NULL
+             ORDER BY r.rental_date DESC`
+        );
+        return rentals;
+    } catch (error) {
+        console.error('Error al buscar alquileres activos:', error);
+        throw error;
+    }
+};
+
+export const fetchAllRentals = async () => {
+    await initialized;
+    const database = await db;
+    try {
+        const rentals = await database.getAllAsync(
+            `SELECT r.*, d.name AS dress_name, d.image_path AS dress_image, u.full_name
+             FROM RENTAL r
+             JOIN DRESS d ON r.id_dress = d.id
+             LEFT JOIN USER u ON r.id_user = u.id
+             ORDER BY r.rental_date DESC`
+        );
+        return rentals;
+    } catch (error) {
+        console.error('Error al buscar alquileres:', error);
+        throw error;
+    }
+};
+
+export const postRental = async (rental: any) => {
+    await initialized;
+    const { id_dress, id_user, client_name, rental_date, days } = rental;
+    const database = await db;
+
+    const statement: SQLite.SQLiteStatement = await database.prepareAsync(
+        'INSERT INTO RENTAL (id_dress, id_user, client_name, rental_date, days) VALUES ($id_dress, $id_user, $client_name, $rental_date, $days)'
+    );
+
+    try {
+        const result = await statement.executeAsync({
+            $id_dress: id_dress,
+            $id_user: id_user || null,
+            $client_name: client_name || null,
+            $rental_date: rental_date,
+            $days: days,
+        });
+
+        await database.runAsync(
+            'UPDATE DRESS SET is_available = 0 WHERE id = ?',
+            [id_dress]
+        );
+
+        return result.lastInsertRowId;
+    } catch (error: any) {
+        console.error('Error al crear alquiler:', error);
+        throw new Error(error);
+    } finally {
+        await statement.finalizeAsync();
+    }
+};
+
+export const fetchRentalByDressId = async (dressId: number) => {
+    await initialized;
+    const database = await db;
+    try {
+        const rental = await database.getAllAsync(
+            `SELECT r.*, d.name AS dress_name, d.image_path AS dress_image, u.full_name
+             FROM RENTAL r
+             JOIN DRESS d ON r.id_dress = d.id
+             LEFT JOIN USER u ON r.id_user = u.id
+             WHERE r.id_dress = $id_dress AND r.return_date IS NULL
+             LIMIT 1`,
+            { $id_dress: dressId }
+        );
+        return rental[0] || null;
+    } catch (error) {
+        console.error('Error al buscar alquiler del vestido:', error);
+        throw error;
+    }
+};
+
+export const deleteRental = async (rentalId: number, dressId: number) => {
+    await initialized;
+    const database = await db;
+
+    try {
+        await database.runAsync('DELETE FROM RENTAL WHERE id = ?', [rentalId]);
+        await database.runAsync('UPDATE DRESS SET is_available = 1 WHERE id = ?', [dressId]);
+    } catch (error) {
+        console.error('Error al eliminar alquiler:', error);
+        throw error;
     }
 };

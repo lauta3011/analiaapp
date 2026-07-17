@@ -22,7 +22,7 @@ export const AppointmentDetail = ({ appointment }: AppointmentDetailProps) => {
     const goToClient = () => {
         if (appointment.id_user) {
             closeModal();
-            router.push(`/user/${appointment.id_user}`);
+            router.push({ pathname: `/user/${appointment.id_user}`, params: { appointmentId: appointment.id } });
         }
     };
 
@@ -42,8 +42,9 @@ export const AppointmentDetail = ({ appointment }: AppointmentDetailProps) => {
                     </View>
                 )}
             </View>
-            <TouchableOpacity 
-                style={styles.infoRow} 
+
+            <TouchableOpacity
+                style={styles.infoRow}
                 onPress={goToClient}
                 disabled={!appointment.id_user}
             >
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     clientLink: {
-        fontSize: 15,
+        fontSize: 16,
         color: COLORS.primary,
         fontWeight: '600',
     },
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     datetimeText: {
-        fontSize: 14,
+        fontSize: 15,
         color: COLORS.primary,
         fontWeight: '500',
     },
@@ -116,14 +117,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     notesLabel: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: '600',
         color: COLORS.textSecondary,
         marginBottom: 4,
         textTransform: 'uppercase',
     },
     notes: {
-        fontSize: 14,
+        fontSize: 15,
         color: COLORS.text,
         lineHeight: 20,
     },

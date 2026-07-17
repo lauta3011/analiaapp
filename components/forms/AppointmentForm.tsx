@@ -1,18 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from "react-native";
+import React, { useState } from "react";
+import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { TextInput, Button, Checkbox } from "react-native-paper";
 import { useAppointmentStore } from "@/store/appointments";
-import { fetchUsersBySearch } from "@/database/database";
 import Toast from "react-native-toast-message";
 import { COLORS } from "@/constants";
+import { Text } from "react-native";
+import { ClientSearch } from "../molecules/ClientSearch";
 
 interface AppointmentFormProps {
     handleHide: () => void;
     selectedDate: string;
     initialHour: number | null;
 }
-
-const DEBOUNCE_MS = 300;
 
 export const AppointmentForm = ({ handleHide, selectedDate, initialHour }: AppointmentFormProps) => {
     const addAppointment = useAppointmentStore((s) => s.addAppointment);
@@ -23,42 +22,6 @@ export const AppointmentForm = ({ handleHide, selectedDate, initialHour }: Appoi
     const [notes, setNotes] = useState('');
     const [selectedClient, setSelectedClient] = useState<any>(null);
     const [noClient, setNoClient] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filteredClients, setFilteredClients] = useState<any[]>([]);
-    const [showClientList, setShowClientList] = useState(false);
-    const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    useEffect(() => {
-        return () => {
-            if (debounceTimer.current) clearTimeout(debounceTimer.current);
-        };
-    }, []);
-
-    const handleSearch = (text: string) => {
-        setSearchQuery(text);
-
-        if (debounceTimer.current) clearTimeout(debounceTimer.current);
-
-        if (!text.trim()) {
-            setFilteredClients([]);
-            setShowClientList(false);
-            setSelectedClient(null);
-            return;
-        }
-
-        debounceTimer.current = setTimeout(async () => {
-            const results = await fetchUsersBySearch(text.trim());
-            setFilteredClients(results);
-            setShowClientList(true);
-        }, DEBOUNCE_MS);
-    };
-
-    const handleSelectClient = (client: any) => {
-        setSelectedClient(client);
-        setNoClient(false);
-        setSearchQuery(client.full_name);
-        setShowClientList(false);
-    };
 
     const handleTimeChange = (text: string) => {
         const digits = text.replace(/[^0-9]/g, '');
@@ -128,14 +91,14 @@ export const AppointmentForm = ({ handleHide, selectedDate, initialHour }: Appoi
                     style={styles.input}
                 />
 
-                <Text style={styles.label}>Cliente</Text>
-                <TextInput
-                    mode="outlined"
-                    placeholder="Buscar cliente..."
-                    value={searchQuery}
-                    onChangeText={handleSearch}
+                <ClientSearch
+                    selectedClient={selectedClient}
+                    onSelectClient={(client) => {
+                        setSelectedClient(client);
+                        setNoClient(false);
+                    }}
+                    onClearClient={() => setSelectedClient(null)}
                     disabled={noClient}
-                    style={styles.input}
                 />
 
                 <TouchableOpacity 
@@ -144,7 +107,6 @@ export const AppointmentForm = ({ handleHide, selectedDate, initialHour }: Appoi
                         setNoClient(!noClient);
                         if (!noClient) {
                             setSelectedClient(null);
-                            setSearchQuery('');
                         }
                     }}
                     activeOpacity={0.7}
@@ -155,24 +117,6 @@ export const AppointmentForm = ({ handleHide, selectedDate, initialHour }: Appoi
                     />
                     <Text style={styles.checkboxLabel}>Sin cliente</Text>
                 </TouchableOpacity>
-
-                {showClientList && filteredClients.length > 0 && (
-                    <View style={styles.clientListContainer}>
-                        {filteredClients.map((client) => (
-                            <TouchableOpacity
-                                key={client.id.toString()}
-                                style={[
-                                    styles.clientItem,
-                                    selectedClient?.id === client.id && styles.clientItemSelected
-                                ]}
-                                onPress={() => handleSelectClient(client)}
-                            >
-                                <Text style={styles.clientName}>{client.full_name}</Text>
-                                <Text style={styles.clientPhone}>{client.phone}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                )}
             </View>
 
             <Text style={styles.label}>Hora</Text>
@@ -232,7 +176,7 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     label: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '600',
         color: COLORS.text,
         marginTop: 12,
@@ -241,49 +185,13 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: '#fff',
     },
-    clientListContainer: {
-        position: 'absolute',
-        top: 56,
-        left: 0,
-        right: 0,
-        maxHeight: 200,
-        borderWidth: 1,
-        borderColor: COLORS.primaryLight,
-        borderRadius: 8,
-        overflow: 'hidden',
-        backgroundColor: '#fff',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 4,
-        elevation: 4,
-        zIndex: 10,
-    },
-    clientItem: {
-        padding: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.primaryLight,
-    },
-    clientItemSelected: {
-        backgroundColor: COLORS.primaryLight,
-    },
-    clientName: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: COLORS.text,
-    },
-    clientPhone: {
-        fontSize: 12,
-        color: COLORS.textSecondary,
-        marginTop: 2,
-    },
     checkboxRow: {
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 4,
     },
     checkboxLabel: {
-        fontSize: 14,
+        fontSize: 15,
         color: COLORS.text,
     },
     buttons: {

@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         borderColor: COLORS.primaryLight,
     },
     title: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '600',
         color: COLORS.text,
         marginTop: 12,

@@ -7,6 +7,9 @@ export type ModalType =
     | 'eyelash-session'
     | 'tag-form'
     | 'add-client'
+    | 'dress-form'
+    | 'rental-form'
+    | 'rental-detail'
     | null;
 
 interface ModalState {

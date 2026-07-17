@@ -1,39 +1,38 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS, VIEW_MODES } from '@/constants';
+import { COLORS, DRESS_SWITCH_MODES } from '@/constants';
 
-type ViewMode = typeof VIEW_MODES[keyof typeof VIEW_MODES];
+type SwitchMode = typeof DRESS_SWITCH_MODES[keyof typeof DRESS_SWITCH_MODES];
 
-interface ViewSwitcherProps {
-    activeView: ViewMode;
-    onViewChange: (view: ViewMode) => void;
+interface DressSwitcherProps {
+    activeMode: SwitchMode;
+    onModeChange: (mode: SwitchMode) => void;
 }
 
-const VIEWS = [
-    { key: VIEW_MODES.DAILY, label: 'Diario' },
-    { key: VIEW_MODES.WEEKLY, label: 'Semanal' },
-    { key: VIEW_MODES.MONTHLY, label: 'Mensual' },
+const MODES = [
+    { key: DRESS_SWITCH_MODES.ALL, label: 'Todas' },
+    { key: DRESS_SWITCH_MODES.RENTED, label: 'Alquiladas' },
 ];
 
-export const ViewSwitcher = ({ activeView, onViewChange }: ViewSwitcherProps) => {
+export const DressSwitcher = ({ activeMode, onModeChange }: DressSwitcherProps) => {
     return (
         <View style={styles.container}>
-            {VIEWS.map((view) => (
+            {MODES.map((mode) => (
                 <TouchableOpacity
-                    key={view.key}
+                    key={mode.key}
                     style={[
                         styles.button,
-                        activeView === view.key && styles.activeButton,
+                        activeMode === mode.key && styles.activeButton,
                     ]}
-                    onPress={() => onViewChange(view.key)}
+                    onPress={() => onModeChange(mode.key)}
                 >
                     <Text
                         style={[
                             styles.label,
-                            activeView === view.key && styles.activeLabel,
+                            activeMode === mode.key && styles.activeLabel,
                         ]}
                     >
-                        {view.label}
+                        {mode.label}
                     </Text>
                 </TouchableOpacity>
             ))}
@@ -51,7 +50,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     button: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
         paddingVertical: 8,
         borderRadius: 18,
     },

@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     day: {
         flex: 1,
         textAlign: 'center',
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: '600',
         color: COLORS.textSecondary,
         paddingVertical: 6,
